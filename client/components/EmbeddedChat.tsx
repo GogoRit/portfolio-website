@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import { Send, Bot, User, Sparkles, Lightbulb } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import { motion, useInView } from "framer-motion";
 
 interface Message {
   id: string;
@@ -24,136 +26,19 @@ export function EmbeddedChat() {
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
   const quickQuestions = [
     "What is Gaurank currently working on?",
     "Tell me about his AI projects",
     "What's his tech stack?",
+    "Why should we hire him?",
+    "What's something quirky about him?",
+    "Tell me about aiPaperboyz in one sentence.",
   ];
 
-  const responses: { [key: string]: string } = {
-    // Current work
-    current:
-      "🚀 Gaurank is currently working as an AI Developer at Magic Spell Studios, developing AI-driven podcast summarization and transcript retrieval systems. He's also pursuing his MS in Data Science at RIT with a perfect 4.0 GPA!",
-
-    // Hobbies and interests
-    hobbies:
-      "🎯 Gaurank enjoys exploring the latest AI research papers, building side projects with LangChain and generative AI, contributing to open-source projects, and staying up-to-date with emerging technologies in the AI/ML space.",
-
-    // AI Projects
-    projects:
-      "🤖 Gaurank has worked on several impressive AI projects: 1) A transparency study on AI-generated news summaries that reduced hallucinations by 90%, 2) A LangChain-based conversational agent with 30% accuracy improvement, and 3) NFT scarcity optimization models at EVOLV startup.",
-
-    // Education
-    education:
-      "🎓 Gaurank is pursuing a Master of Science in Data Science at Rochester Institute of Technology (RIT) with a perfect 4.0 GPA, expected to graduate in December 2025. He also has a Bachelor's in Computer Science from LNMIIT, India.",
-
-    // Tech stack
-    tech: "💻 Gaurank's tech stack includes: React, TypeScript, FastAPI, PostgreSQL, Docker, OpenAI GPT-4, Deepgram, LangChain, Hugging Face Transformers, AWS, Firebase Auth, and GitLab CI/CD. He specializes in full-stack AI application development.",
-
-    // Contact
-    contact:
-      "📧 You can reach Gaurank at gm8189@g.rit.edu or call him at +1 (585) 957-6312. He's based in Rochester, NY and is open to opportunities in AI infrastructure, ML products, and full-stack development roles.",
-
-    // Experience
-    experience:
-      "💼 Gaurank has experience at Magic Spell Studios (AI Developer), AWARE-AI NSF Research Program (Research Trainee), RIT (Teaching Assistant for Neural Networks), and EVOLV startup (Junior Data Scientist).",
-
-    // Skills
-    skills:
-      "⚡ Gaurank excels in Generative AI, Agentic AI systems, LangChain development, prompt engineering, fine-tuning, multimodal AI, FastAPI backend development, React/TypeScript frontends, and MLOps.",
-
-    // Research
-    research:
-      "🔬 Gaurank is working on transparency in AI-generated content, focusing on reducing hallucinations and improving bias detection. He's part of the AWARE-AI NSF Research Traineeship Program.",
-
-    // Default responses
-    default:
-      "That's a great question! Based on Gaurank's background, I'd recommend checking out his resume or reaching out to him directly at gm8189@g.rit.edu. He's always happy to discuss AI, technology, and potential collaborations! 😊",
-
-    greeting:
-      "Hello! I'm here to help you learn more about Gaurank. Feel free to ask about his projects, experience, tech skills, or anything else you'd like to know! ✨",
-  };
-
-  const getResponse = (userMessage: string): string => {
-    const message = userMessage.toLowerCase();
-
-    if (
-      message.includes("working") ||
-      message.includes("current") ||
-      message.includes("job")
-    ) {
-      return responses.current;
-    }
-    if (
-      message.includes("hobby") ||
-      message.includes("hobbies") ||
-      message.includes("interest")
-    ) {
-      return responses.hobbies;
-    }
-    if (
-      message.includes("project") ||
-      message.includes("ai project") ||
-      message.includes("built")
-    ) {
-      return responses.projects;
-    }
-    if (
-      message.includes("education") ||
-      message.includes("school") ||
-      message.includes("university") ||
-      message.includes("gpa")
-    ) {
-      return responses.education;
-    }
-    if (
-      message.includes("tech") ||
-      message.includes("technology") ||
-      message.includes("stack") ||
-      message.includes("tools")
-    ) {
-      return responses.tech;
-    }
-    if (
-      message.includes("contact") ||
-      message.includes("email") ||
-      message.includes("phone") ||
-      message.includes("reach")
-    ) {
-      return responses.contact;
-    }
-    if (
-      message.includes("experience") ||
-      message.includes("work") ||
-      message.includes("job")
-    ) {
-      return responses.experience;
-    }
-    if (
-      message.includes("skill") ||
-      message.includes("expert") ||
-      message.includes("good at")
-    ) {
-      return responses.skills;
-    }
-    if (
-      message.includes("research") ||
-      message.includes("paper") ||
-      message.includes("study")
-    ) {
-      return responses.research;
-    }
-    if (
-      message.includes("hi") ||
-      message.includes("hello") ||
-      message.includes("hey")
-    ) {
-      return responses.greeting;
-    }
-
-    return responses.default;
-  };
+  // ✨ Responses now come from backend `/api/chat`.
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -169,20 +54,34 @@ export function EmbeddedChat() {
     setInput("");
     setIsTyping(true);
 
-    // Simulate AI thinking time
-    setTimeout(
-      () => {
-        const botResponse: Message = {
-          id: (Date.now() + 1).toString(),
-          text: getResponse(input),
-          sender: "bot",
-          timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, botResponse]);
-        setIsTyping(false);
-      },
-      800 + Math.random() * 800,
-    ); // 0.8-1.6 second delay
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: input }),
+      });
+
+      const data = await response.json();
+
+      const botResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        text: data.answer ?? "Sorry, I couldn’t fetch a response.",
+        sender: "bot",
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, botResponse]);
+    } catch (err) {
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "Sorry, something went wrong while contacting the AI service.",
+        sender: "bot",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorResponse]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleQuickQuestion = (question: string) => {
@@ -196,7 +95,13 @@ export function EmbeddedChat() {
   }, [messages, isTyping]);
 
   return (
-    <div className="w-full mt-16 mb-8 pt-5">
+    <motion.section
+      id="ai"
+      className="py-24 bg-gradient-to-br from-primary/5 via-background to-accent/5 overflow-hidden w-full"
+      ref={sectionRef}
+      initial={{ opacity: 0, y: 40 }}
+      animate={isInView ? { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } } : {}}
+    >
       {/* Chat Header */}
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-3 mb-3">
@@ -208,7 +113,20 @@ export function EmbeddedChat() {
           </h2>
           <div className="flex items-center gap-1 text-sm text-muted-foreground">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            Online
+            Online • Powered by Gaurank’s real-world experience
+            {/* Info tooltip */}
+            <TooltipProvider delayDuration={100}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="cursor-help text-muted-foreground">
+                    <Lightbulb className="w-4 h-4" />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs text-center">
+                  This assistant is grounded in Gaurank’s resume, research, and project work and responds like a recruiter-facing AI with personality.
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
       </div>
@@ -218,9 +136,9 @@ export function EmbeddedChat() {
 
       {/* Chat Interface */}
       <div className="max-w-4xl mx-auto">
-        <Card className="bg-background/40 backdrop-blur-sm border border-border/20 shadow-lg">
-          <CardContent className="p-6">
-            <ScrollArea className="h-80 mb-6" ref={scrollAreaRef}>
+        <Card className="bg-background/60 backdrop-blur-md border border-border/30 shadow-2xl rounded-3xl">
+          <CardContent className="p-8 md:p-10">
+            <ScrollArea className="h-[28rem] mb-8 pr-2" ref={scrollAreaRef}>
               <div className="space-y-4 pr-4">
                 {messages.map((message) => (
                   <div
@@ -281,12 +199,12 @@ export function EmbeddedChat() {
 
             {/* Quick Questions */}
             {messages.length === 1 && (
-              <div className="mb-6 p-4 rounded-xl bg-background/20 border border-border/20">
+              <div className="mb-8 p-5 rounded-2xl bg-background/30 border border-border/30">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
                   <Lightbulb className="w-4 h-4" />
                   <span className="font-medium">Popular questions:</span>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap justify-center gap-3">
                   {quickQuestions.map((question, index) => (
                     <Button
                       key={index}
@@ -303,18 +221,18 @@ export function EmbeddedChat() {
             )}
 
             {/* Input Area */}
-            <div className="flex gap-3">
+            <div className="flex gap-4 mt-4">
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask me anything about Gaurank..."
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                className="flex-1 h-12 px-4 text-base"
+                className="flex-1 h-14 px-5 text-base rounded-xl focus:ring-2 focus:ring-primary/60 shadow-sm"
               />
               <Button
                 onClick={handleSend}
                 size="lg"
-                className="px-6 glow-hover"
+                className="px-6 glow-hover shadow-md"
               >
                 <Send className="w-5 h-5" />
               </Button>
@@ -322,6 +240,6 @@ export function EmbeddedChat() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </motion.section>
   );
 }

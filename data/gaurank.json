@@ -1,0 +1,146 @@
+{
+  "name": "Gaurank Maheshwari",
+  "title": "AI Developer | Researcher | Data Scientist",
+  "origin": {
+    "hometown": "Kishangarh, Rajasthan, India",
+    "current_location": "Rochester, NY, USA"
+  },
+  "contact": {
+    "email": "gm8189@g.rit.edu",
+    "phone": "+1 (585) 957-6312",
+    "github": "https://github.com/GogoRit",
+    "linkedin": "https://www.linkedin.com/in/gaurank",
+    "location": "Rochester, NY, USA"
+  },
+  "education": [
+    {
+      "institution": "Rochester Institute of Technology (RIT)",
+      "degree": "M.S. in Data Science",
+      "gpa": "4.0 / 4.0",
+      "graduation_date": "Dec 2025 (expected)",
+      "courses": [
+        "Neural Networks",
+        "Human Factors in AI",
+        "Applied Statistics",
+        "Software Engineering for Data Science"
+      ]
+    },
+    {
+      "institution": "LNMIIT, Jaipur",
+      "degree": "B.Tech. in Computer Science",
+      "graduation_date": "May 2023"
+    }
+  ],
+  "current_role": {
+    "title": "AI Developer",
+    "company": "MAGIC Spell Studios",
+    "start": "Jan 2025",
+    "summary": "Leading development of aiPaperboyz – an AI-powered podcast-summarization and transcript-delivery platform. Built a scalable FastAPI/PostgreSQL backend, a Deepgram + GPT-4 enrichment pipeline, an email-delivery scheduler with AWS SES, and a secure React/TypeScript frontend with Firebase Auth and Tailwind CSS. Deployed CI/CD via Docker and GitHub Actions."
+  },
+  "research": [
+    {
+      "program": "AWARE-AI NSF Research Traineeship",
+      "start": "Aug 2024",
+      "focus": "Multimodal information processing and human-AI interaction",
+      "impact": "Contributed to a robot–human collaboration project using genetic algorithms, improving task-completion efficiency by 20%.",
+      "labs": [
+        "Multi-Agent Robotics Lab",
+        "Center for Accessibility and Inclusion Research"
+      ]
+    }
+  ],
+  "work_experience": [
+    {
+      "title": "Junior Data Scientist",
+      "company": "EVOLV (DeMons), Bengaluru, India",
+      "start": "Jan 2023",
+      "end": "Jul 2023",
+      "summary": "Built data-driven models to enhance NFT scarcity using behavioral metrics, increasing perceived token value by 10% and boosting launch interest among more than 200 users."
+    },
+    {
+      "title": "Graduate Teaching Assistant",
+      "company": "RIT",
+      "start": "Aug 2024",
+      "summary": "Teaching Assistant for DSCI-640 (Neural Networks) and DSCI-601 (Applied Data Science); helped students debug models, apply ML algorithms, and structure deep-learning pipelines."
+    }
+  ],
+  "projects": [
+    {
+      "name": "aiPaperboyz",
+      "description": "An AI-powered podcast-summarization platform with speaker diarization and transcript enrichment using LLM agents. Features scheduled email delivery, a personalized feed, and a secure frontend UI. Built with React, FastAPI, PostgreSQL, AWS SES, Deepgram, and GPT-4.",
+      "tech": ["OpenAI", "Deepgram", "FastAPI", "Docker", "PostgreSQL", "Firebase", "Tailwind CSS", "React", "TypeScript"]
+    },
+    {
+      "name": "NewsLens AI",
+      "description": "Capstone project that reduced hallucinations in AI-generated news summaries by more than 90% using Gemini, GPT-3.5, and Hugging Face NER; also established a bias-detection metric pipeline.",
+      "tech": ["Gemini", "GPT-3.5", "NER", "Hugging Face", "TensorFlow", "Python"]
+    },
+    {
+      "name": "LangChain Q&A Agent",
+      "description": "Developed a LangChain-based knowledge-extraction tool with FAISS and GPT, improving retrieval accuracy by 30% over 100+ queries. Delivered in a Streamlit UI.",
+      "tech": ["LangChain", "FAISS", "OpenAI API", "Hugging Face", "Streamlit"]
+    }
+  ],
+  "skills": {
+    "languages": ["Python", "TypeScript", "Java", "SQL", "HTML", "LaTeX"],
+    "frameworks": [
+      "LangChain",
+      "LangFlow",
+      "Crew AI",
+      "Swarm",
+      "Autogen",
+      "PyTorch",
+      "FastAPI",
+      "React",
+      "Tailwind CSS",
+      "Streamlit",
+      "Hugging Face Transformers"
+    ],
+    "tools": [
+      "Docker",
+      "PostgreSQL",
+      "Firebase",
+      "AWS SES",
+      "OpenAI API",
+      "Deepgram",
+      "GitHub",
+      "VS Code",
+      "Jupyter Notebook",
+      "FAISS",
+      "Tableau",
+      "Vite",
+      "Notion"
+    ],
+    "concepts": [
+      "Generative AI",
+      "Agentic AI",
+      "Prompt Engineering",
+      "Retrieval-Augmented Generation (RAG)",
+      "Fine-Tuning",
+      "MLOps",
+      "Bias & Hallucination Detection",
+      "Multimodal AI"
+    ]
+  },
+  "traits": {
+    "strengths": [
+      "Clear communicator with a deep understanding of LLM and agentic pipelines",
+      "Translates research insights into scalable product systems",
+      "Thrives in iterative, founder-style build cycles",
+      "Balances full-stack responsibilities with model optimization"
+    ],
+    "weaknesses": [
+      "Tends to over-polish and over-document by default",
+      "May over-engineer if early constraints are not clearly defined",
+      "Can over-commit without scoped timelines"
+    ]
+  },
+  "fun_facts": [
+    "Loves to travel and explore uncharted places — from spontaneous road trips to structured adventure itineraries — and is especially fond of motorbike journeys.",
+    "Has gone bungee-jumping in Rishikesh and is always chasing the next adrenaline rush.",
+    "Former state-level cricket player in Rajasthan; applies lessons of discipline, strategy, and teamwork from the pitch to the codebase.",
+    "Cooks great food — especially fusion and Indian-spiced meals — and pairs it with carefully curated playlists that match mood, tempo, and flow.",
+    "Enjoys motivational films such as ‘The Social Network’, ‘3 Idiots’, and ‘The Pursuit of Happyness’, but balances them with plenty of comedy because laughter builds resilience.",
+    "Known to quote lines like: ‘Great men are not born great… they grow great.’ (The Godfather) or ‘We accept the love we think we deserve.’ (The Perks of Being a Wallflower)."
+  ]
+} 

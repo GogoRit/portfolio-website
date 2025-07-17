@@ -48,129 +48,7 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
     "How can I contact Gaurank?",
   ];
 
-  const responses: { [key: string]: string } = {
-    // Current work
-    current:
-      "Gaurank is currently working as an AI Developer at Magic Spell Studios, developing AI-driven podcast summarization and transcript retrieval systems. He's also pursuing his MS in Data Science at RIT with a perfect 4.0 GPA and working as a Research Trainee in the AWARE-AI NSF program.",
-
-    // Hobbies and interests
-    hobbies:
-      "Gaurank enjoys exploring the latest AI research papers, building side projects with LangChain and generative AI, contributing to open-source projects, and staying up-to-date with emerging technologies in the AI/ML space. He's passionate about making AI more transparent and accessible.",
-
-    // AI Projects
-    projects:
-      "Gaurank has worked on several impressive AI projects: 1) A transparency study on AI-generated news summaries that reduced hallucinations by 90%, 2) A LangChain-based conversational agent with 30% accuracy improvement, and 3) NFT scarcity optimization models at EVOLV startup that increased value by 15%.",
-
-    // Education
-    education:
-      "Gaurank is pursuing a Master of Science in Data Science at Rochester Institute of Technology (RIT) with a perfect 4.0 GPA, expected to graduate in December 2025. He also has a Bachelor's in Computer Science from LNMIIT, India. His coursework includes Neural Networks, Human Factors in AI, and Software Engineering for Data Science.",
-
-    // Tech stack
-    tech: "Gaurank's tech stack includes: AI/ML (LangChain, Hugging Face, OpenAI GPT-4, Deepgram), Backend (FastAPI, PostgreSQL, Docker), Frontend (React, TypeScript, Tailwind CSS), Cloud (AWS, Firebase), and DevOps (GitLab CI/CD, Docker Compose). He specializes in full-stack AI application development.",
-
-    // Contact
-    contact:
-      "You can reach Gaurank at gm8189@g.rit.edu or call him at +1 (585) 957-6312. He's based in Rochester, NY and is open to opportunities in AI infrastructure, ML products, and full-stack development roles.",
-
-    // Experience
-    experience:
-      "Gaurank has experience at Magic Spell Studios (AI Developer), AWARE-AI NSF Research Program (Research Trainee), RIT (Teaching Assistant for Neural Networks), and EVOLV startup (Junior Data Scientist). He's worked on scaling AI systems for millions of users and contributed to research improving human-AI interaction.",
-
-    // Skills
-    skills:
-      "Gaurank excels in Generative AI, Agentic AI systems, LangChain development, prompt engineering, fine-tuning, multimodal AI, FastAPI backend development, React/TypeScript frontends, and MLOps. He's particularly strong in building production-grade AI applications.",
-
-    // Research
-    research:
-      "Gaurank is working on transparency in AI-generated content, focusing on reducing hallucinations and improving bias detection. He's part of the AWARE-AI NSF Research Traineeship Program and has contributed to robot-human collaboration projects using genetic algorithms.",
-
-    // Default responses
-    default:
-      "That's a great question! Based on Gaurank's background, I'd recommend checking out his resume or reaching out to him directly at gm8189@g.rit.edu. He's always happy to discuss AI, technology, and potential collaborations! 😊",
-
-    greeting:
-      "Hello! I'm here to help you learn more about Gaurank. Feel free to ask about his projects, experience, tech skills, or anything else you'd like to know!",
-  };
-
-  const getResponse = (userMessage: string): string => {
-    const message = userMessage.toLowerCase();
-
-    if (
-      message.includes("working") ||
-      message.includes("current") ||
-      message.includes("job")
-    ) {
-      return responses.current;
-    }
-    if (
-      message.includes("hobby") ||
-      message.includes("hobbies") ||
-      message.includes("interest")
-    ) {
-      return responses.hobbies;
-    }
-    if (
-      message.includes("project") ||
-      message.includes("ai project") ||
-      message.includes("built")
-    ) {
-      return responses.projects;
-    }
-    if (
-      message.includes("education") ||
-      message.includes("school") ||
-      message.includes("university") ||
-      message.includes("gpa")
-    ) {
-      return responses.education;
-    }
-    if (
-      message.includes("tech") ||
-      message.includes("technology") ||
-      message.includes("stack") ||
-      message.includes("tools")
-    ) {
-      return responses.tech;
-    }
-    if (
-      message.includes("contact") ||
-      message.includes("email") ||
-      message.includes("phone") ||
-      message.includes("reach")
-    ) {
-      return responses.contact;
-    }
-    if (
-      message.includes("experience") ||
-      message.includes("work") ||
-      message.includes("job")
-    ) {
-      return responses.experience;
-    }
-    if (
-      message.includes("skill") ||
-      message.includes("expert") ||
-      message.includes("good at")
-    ) {
-      return responses.skills;
-    }
-    if (
-      message.includes("research") ||
-      message.includes("paper") ||
-      message.includes("study")
-    ) {
-      return responses.research;
-    }
-    if (
-      message.includes("hi") ||
-      message.includes("hello") ||
-      message.includes("hey")
-    ) {
-      return responses.greeting;
-    }
-
-    return responses.default;
-  };
+  // ✨ All responses now come from the backend `/api/chat` endpoint.
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -186,20 +64,34 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
     setInput("");
     setIsTyping(true);
 
-    // Simulate AI thinking time
-    setTimeout(
-      () => {
-        const botResponse: Message = {
-          id: (Date.now() + 1).toString(),
-          text: getResponse(input),
-          sender: "bot",
-          timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, botResponse]);
-        setIsTyping(false);
-      },
-      1000 + Math.random() * 1000,
-    ); // 1-2 second delay
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: input }),
+      });
+
+      const data = await response.json();
+
+      const botResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        text: data.answer ?? "Sorry, I couldn’t fetch a response.",
+        sender: "bot",
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, botResponse]);
+    } catch (err) {
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "Sorry, something went wrong while contacting the AI service.",
+        sender: "bot",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorResponse]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleQuickQuestion = (question: string) => {
@@ -223,7 +115,7 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
             <div>
               <div className="font-semibold">Ask Gaurank AI</div>
               <div className="text-xs text-muted-foreground font-normal">
-                Powered by AI • Always learning
+                Powered by AI • Based on Gaurank’s real-world experience
               </div>
             </div>
           </DialogTitle>

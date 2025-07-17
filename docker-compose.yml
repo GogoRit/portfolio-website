@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build: .
@@ -7,11 +5,10 @@ services:
     ports:
       - "3000:8080" # Map host 3000 to container 8080 (Vite dev server)
     volumes:
-      - .:/app # Mount current directory for live reload
-      - /app/node_modules # Prevents overwriting node_modules in container
+      - .:/app          # live-reload your code
+      - /app/node_modules   # ← keep deps from the image
     environment:
       - NODE_ENV=development
       - PORT=8080
-    env_file:
-      - .env # Loads environment variables if .env exists
+      - OPENAI_API_KEY=${OPENAI_API_KEY}   # <─ will read from your host env
     command: ["npm", "run", "dev"] 
