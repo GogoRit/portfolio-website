@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Building, GraduationCap, Calendar } from "lucide-react";
 
 const NowSection: React.FC = () => (
-  <section id="now" className="section-sm bg-muted/20">
+  <section id="now" className="section-sm bg-muted/20 min-h-screen">
     <div className="container mx-auto px-4">
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="text-3xl lg:text-4xl font-bold mb-8">

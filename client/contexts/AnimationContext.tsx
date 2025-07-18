@@ -7,6 +7,8 @@ interface AnimationContextType {
   setAnimationTriggered: (triggered: boolean) => void;
   showMainPage: boolean;
   setShowMainPage: (show: boolean) => void;
+  aiTraveling: boolean;
+  setAiTraveling: (traveling: boolean) => void;
 }
 
 const AnimationContext = createContext<AnimationContextType | undefined>(undefined);
@@ -27,6 +29,7 @@ export const AnimationProvider: React.FC<AnimationProviderProps> = ({ children }
   const [agentLanded, setAgentLanded] = useState(false);
   const [animationTriggered, setAnimationTriggered] = useState(false);
   const [showMainPage, setShowMainPage] = useState(false);
+  const [aiTraveling, setAiTraveling] = useState(false);
 
   return (
     <AnimationContext.Provider 
@@ -36,7 +39,9 @@ export const AnimationProvider: React.FC<AnimationProviderProps> = ({ children }
         animationTriggered, 
         setAnimationTriggered,
         showMainPage,
-        setShowMainPage
+        setShowMainPage,
+        aiTraveling,
+        setAiTraveling
       }}
     >
       {children}

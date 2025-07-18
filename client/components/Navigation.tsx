@@ -47,7 +47,7 @@ const Navigation: React.FC = () => {
           }
         });
       },
-      { threshold: 0.1, rootMargin: "0px 0px -20% 0px" }
+      { threshold: 0.3, rootMargin: "-10% 0px -40% 0px" }
     );
 
     sectionElements.forEach((el) => observer.observe(el));
@@ -60,9 +60,32 @@ const Navigation: React.FC = () => {
 
     window.addEventListener("scroll", handleScrollBottom);
 
+    // --- Fallback: update activeSection on scroll based on section positions ---
+    const handleScrollActiveSection = () => {
+      const scrollPosition = window.scrollY + window.innerHeight / 3;
+      let currentSection = navItems[0].href;
+      for (const item of navItems) {
+        const el = document.querySelector(item.href);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          const elTop = rect.top + window.scrollY;
+          if (scrollPosition >= elTop) {
+            currentSection = item.href;
+          }
+        }
+      }
+      // If at (or near) the bottom, always highlight contact
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 2) {
+        currentSection = "#contact";
+      }
+      setActiveSection(currentSection);
+    };
+    window.addEventListener('scroll', handleScrollActiveSection);
+
     return () => {
       observer.disconnect();
       window.removeEventListener("scroll", handleScrollBottom);
+      window.removeEventListener('scroll', handleScrollActiveSection);
     };
   }, []);
 
@@ -89,6 +112,7 @@ const Navigation: React.FC = () => {
               <a
                 key={item.href}
                 href={item.href}
+                onClick={() => setActiveSection(item.href)}
                 className={`relative text-sm font-medium transition-colors px-3 py-1 rounded-md border border-transparent hover:bg-primary/10 hover:border-primary/20 ${
                   isActive ? "bg-primary/10 border-primary text-primary" : "text-muted-foreground"
                 }`}

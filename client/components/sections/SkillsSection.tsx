@@ -70,7 +70,7 @@ const SkillsSection: React.FC = () => {
     "🧠 AI & Machine Learning"
   );
   return (
-    <section id="skills" className="section">
+    <section id="skills" className="section min-h-screen">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl lg:text-4xl font-bold text-center mb-16">

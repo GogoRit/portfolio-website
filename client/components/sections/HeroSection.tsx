@@ -5,7 +5,7 @@ import { EmbeddedChat } from "../EmbeddedChat";
 import { MapPin, GraduationCap, Building } from "lucide-react";
 
 const HeroSection: React.FC = () => (
-  <section id="home" className="pt-20 lg:pt-28 pb-8 relative overflow-hidden">
+  <section id="home" className="pt-20 lg:pt-28 pb-8 relative overflow-hidden min-h-screen">
     <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10"></div>
     <div className="container mx-auto px-4 relative z-10">
       <div className="max-w-4xl mx-auto text-center">
