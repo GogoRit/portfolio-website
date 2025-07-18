@@ -1,284 +1,229 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot } from "lucide-react";
 import { AIChatbot } from "./AIChatbot";
-import { AIAssistantIntro } from "./AIAssistantIntro";
 import { useAnimation } from "../contexts/AnimationContext";
 
-// Finite states the widget can be in
-type WidgetState = "intro" | "center-bounce" | "traveling" | "landing" | "collapsed" | "expanded";
+// Bitmoji avatar path
+const BITMOJI_AVATAR = "/icons/bitmoji.png";
 
 export const AIWidget: React.FC = () => {
-  const [state, setState] = useState<WidgetState>("intro");
-  const [centerBounceComplete, setCenterBounceComplete] = useState(false);
-  const [hasLanded, setHasLanded] = useState(false);
-  const [aiPos, setAiPos] = useState({ x: 0, y: 0 });
-  const iconRef = useRef<HTMLDivElement>(null);
-  const { setAgentLanded, setAnimationTriggered, setShowMainPage, setAiTraveling } = useAnimation();
+  const [showChat, setShowChat] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [showWelcomeCloud, setShowWelcomeCloud] = useState(false);
+  const { showMainPage } = useAnimation();
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Center coordinates for travel
-  const [travelCoords, setTravelCoords] = useState({ x: 0, y: 0 });
-
-  // Calculate travel destination (bottom-right)
+  // Persistent welcome cloud logic - shows after intro and stays until clicked
   useEffect(() => {
-    function calcTravelCoords() {
-      const margin = 32; // px from edge
-      const iconSize = 80; // px (w-20)
-      const winW = window.innerWidth;
-      const winH = window.innerHeight;
-      // Center is (0,0) in motion coordinates
-      // Travel to (windowW/2 - margin - iconSize/2, windowH/2 - margin - iconSize/2)
-      setTravelCoords({
-        x: (winW / 2) - margin - iconSize / 2,
-        y: (winH / 2) - margin - iconSize / 2
-      });
+    console.log('AIWidget: Component mounted, showMainPage:', showMainPage);
+    
+    // Since AIWidget only mounts after intro completes, we can show cloud immediately
+    const hasSeenWelcome = sessionStorage.getItem('ai-widget-welcome-seen');
+    console.log('AIWidget: hasSeenWelcome:', hasSeenWelcome);
+    
+    if (!hasSeenWelcome) {
+      console.log('AIWidget: Setting up welcome cloud timer');
+      
+      // Show welcome cloud after a short delay (since we're already after intro)
+      timerRef.current = setTimeout(() => {
+        console.log('AIWidget: Showing welcome cloud');
+        setShowWelcomeCloud(true);
+      }, 1000); // 1 second delay after widget appears
+    } else {
+      console.log('AIWidget: Welcome cloud already seen, not showing');
     }
-    calcTravelCoords();
-    window.addEventListener("resize", calcTravelCoords);
-    return () => window.removeEventListener("resize", calcTravelCoords);
-  }, []);
 
-  // Handle intro completion
-  const handleIntroComplete = () => {
-    console.log("🎬 Intro completed - starting center bounce");
-    setState("center-bounce");
-    document.body.style.overflow = 'auto';
-    window.scrollTo(0, 0);
+    // Cleanup function to clear timers on unmount
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, []); // Only run once when component mounts
+
+  // Handle chat click - hide welcome cloud when user opens chat
+  const handleChatClick = () => {
+    setShowChat(true);
+    // Hide the welcome cloud when user clicks to open chat
+    if (showWelcomeCloud) {
+      setShowWelcomeCloud(false);
+      sessionStorage.setItem('ai-widget-welcome-seen', 'true');
+      console.log('AIWidget: Welcome cloud dismissed by user click');
+    }
   };
 
-  // Center bounce animation complete
-  const handleCenterBounceComplete = () => {
-    console.log("🎯 Center bounce complete - starting travel");
-    setCenterBounceComplete(true);
-    setTimeout(() => {
-      setState("traveling");
-      setAiTraveling(true);
-    }, 300);
+  const handleCloseChat = () => {
+    setShowChat(false);
   };
 
-  // Travel animation complete
-  const handleTravelComplete = () => {
-    console.log("🎯 Travel to corner complete - landing bounce");
-    setState("landing");
-    setAiTraveling(false);
-    setTimeout(() => {
-      setHasLanded(true);
-      setAgentLanded(true);
-      setAnimationTriggered(true);
-    }, 200);
-  };
+  // Apple-style Bitmoji Avatar Component with 3D effects
+  const BitmojiAvatar = ({ className = "" }: { className?: string }) => (
+    <div className={`relative ${className}`}>
+      {/* Outer glowing ring - Siri-style */}
+      <motion.div
+        className="absolute inset-0 rounded-full bg-gradient-to-r from-blue/40 to-purple/40 blur-lg"
+        animate={{
+          opacity: [0.3, 0.6, 0.3],
+          scale: [1, 1.2, 1]
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      
+      {/* 3D shadow layer for depth */}
+      <div className="absolute inset-0 rounded-full bg-black/20 blur-md transform translate-y-1" />
+      
+      {/* Glass container with enhanced depth */}
+      <div className="relative w-full h-full rounded-full backdrop-blur-apple bg-white/20 border border-white/30 shadow-apple-lg overflow-hidden">
+        {/* Bitmoji image with mask for background removal */}
+        <div className="w-full h-full rounded-full overflow-hidden">
+          <img
+            src={BITMOJI_AVATAR}
+            alt="AI Assistant Avatar"
+            className="w-full h-full object-cover object-center"
+            style={{
+              maskImage: 'radial-gradient(circle, black 60%, transparent 100%)',
+              WebkitMaskImage: 'radial-gradient(circle, black 60%, transparent 100%)'
+            }}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23007aff'/%3E%3Cpath d='M30 40c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10-10-4.5-10-10zm20 0c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10-10-4.5-10-10z' fill='white'/%3E%3C/svg%3E";
+            }}
+          />
+        </div>
+      </div>
+      
+      {/* Inner pulse - enhanced glow */}
+      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue/20 to-purple/20 animate-pulse" />
+      
+      {/* Additional 3D highlight */}
+      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/30 to-transparent opacity-60" />
+    </div>
+  );
 
-  // Landing bounce complete
-  const handleLandingComplete = () => {
-    setTimeout(() => {
-      console.log("🏁 Landing complete, calling setShowMainPage(true)");
-      setShowMainPage(true);
-      setState("collapsed");
-    }, 600);
-  };
-
-  // Main render
   return (
     <>
-      {/* New AI Assistant Intro */}
-      <AnimatePresence>
-        {state === "intro" && (
-          <AIAssistantIntro onComplete={handleIntroComplete} />
-        )}
-      </AnimatePresence>
-
-      {/* Cinematic Center Bounce - Step 1: Start in Center */}
-      <AnimatePresence>
-        {state === "center-bounce" && (
-          <motion.div
-            ref={iconRef}
-            initial={{ x: 0, y: 0, scale: 0.8, opacity: 0 }}
-            animate={{
-              x: 0,
-              y: [0, -24, 0, -12, 0],
-              scale: [1.2, 0.9, 1.05, 1],
-              opacity: 1,
-              boxShadow: [
-                "0 0 0 rgba(0,0,0,0)",
-                "0 8px 32px 0 rgba(59,130,246,0.25)",
-                "0 0 0 rgba(0,0,0,0)"
-              ]
-            }}
-            transition={{
-              y: { type: "tween", duration: 1.1, times: [0, 0.3, 0.7, 1] },
-              scale: { type: "tween", duration: 1.1, times: [0, 0.3, 0.7, 1] },
-              boxShadow: { duration: 0.7 },
-              opacity: { duration: 0.3 },
-              duration: 1.1
-            }}
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              zIndex: 110,
-              transform: "translate(-50%, -50%)"
-            }}
-            onAnimationComplete={handleCenterBounceComplete}
-            className="w-20 h-20 rounded-full bg-primary text-background flex items-center justify-center shadow-2xl relative"
-          >
-            {/* Impact ripple */}
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: [0, 2.5, 0.8, 1.5, 0], opacity: [0, 0.5, 0.3, 0.2, 0] }}
-              transition={{ duration: 1.1, times: [0, 0.2, 0.4, 0.7, 1] }}
-              className="absolute inset-0 bg-blue-400/30 rounded-full blur-2xl pointer-events-none"
-            />
-            {/* Glow */}
-            <motion.div
-              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-              className="absolute inset-0 bg-primary/40 rounded-full blur-lg"
-            />
-            <span className="absolute inline-flex h-full w-full rounded-full bg-primary/60 opacity-75 animate-ping"></span>
-            <Bot className="w-8 h-8 relative" />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Travel to Corner - Step 2: Path with bounce */}
-      <AnimatePresence>
-        {state === "traveling" && (
-          <motion.div
-            ref={iconRef}
-            initial={{ x: 0, y: 0, scale: 1 }}
-            animate={{
-              x: travelCoords.x,
-              y: travelCoords.y,
-              scale: [1, 1.08, 0.97, 1.04, 1],
-              boxShadow: [
-                "0 0 0 rgba(0,0,0,0)",
-                "0 8px 32px 0 rgba(59,130,246,0.25)",
-                "0 0 0 rgba(0,0,0,0)"
-              ]
-            }}
-            transition={{
-              x: { type: "spring", stiffness: 60, damping: 16 },
-              y: { type: "spring", stiffness: 60, damping: 16 },
-              scale: { duration: 1.5, times: [0, 0.2, 0.5, 0.8, 1] },
-              boxShadow: { duration: 1.2 },
-              duration: 1.5
-            }}
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              zIndex: 110,
-              transform: "translate(-50%, -50%)"
-            }}
-            onAnimationComplete={handleTravelComplete}
-            className="w-20 h-20 rounded-full bg-primary text-background flex items-center justify-center shadow-2xl relative"
-          >
-            {/* Trail effect */}
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: [0, 1.5, 0], opacity: [0.8, 0.3, 0] }}
-              transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 0.3 }}
-              className="absolute inset-0 bg-blue-400/20 rounded-full blur-md"
-            />
-            {/* Glow */}
-            <motion.div
-              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-              className="absolute inset-0 bg-primary/40 rounded-full blur-lg"
-            />
-            <span className="absolute inline-flex h-full w-full rounded-full bg-primary/60 opacity-75 animate-ping"></span>
-            <Bot className="w-8 h-8 relative" />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Landing Bounce - Step 3: Final landing with impact */}
-      <AnimatePresence>
-        {state === "landing" && (
-          <motion.div
-            ref={iconRef}
-            initial={{ x: travelCoords.x, y: travelCoords.y, scale: 1 }}
-            animate={{
-              scale: [1, 1.18, 0.95, 1.08, 1],
-              y: [travelCoords.y, travelCoords.y - 18, travelCoords.y, travelCoords.y - 7, travelCoords.y],
-              boxShadow: [
-                "0 0 0 rgba(0,0,0,0)",
-                "0 0 30px rgba(59, 130, 246, 0.5)",
-                "0 0 10px rgba(59, 130, 246, 0.3)",
-                "0 0 20px rgba(59, 130, 246, 0.4)",
-                "0 0 0 rgba(0,0,0,0)"
-              ]
-            }}
-            transition={{
-              scale: { type: "tween", duration: 1.1, times: [0, 0.3, 0.7, 0.9, 1] },
-              y: { type: "tween", duration: 1.1, times: [0, 0.3, 0.7, 0.9, 1] },
-              boxShadow: { duration: 1.1 },
-              duration: 1.1
-            }}
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              zIndex: 110,
-              transform: "translate(-50%, -50%)"
-            }}
-            onAnimationComplete={handleLandingComplete}
-            className="w-20 h-20 rounded-full bg-primary text-background flex items-center justify-center shadow-2xl relative"
-          >
-            {/* Landing impact shadow/ripple */}
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: [0, 3, 0], opacity: [1, 0.5, 0] }}
-              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-              className="absolute inset-0 bg-blue-500/30 rounded-full blur-2xl"
-            />
-            {/* Glow */}
-            <motion.div
-              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-              className="absolute inset-0 bg-primary/40 rounded-full blur-lg"
-            />
-            <span className="absolute inline-flex h-full w-full rounded-full bg-primary/60 opacity-75 animate-ping"></span>
-            <Bot className="w-8 h-8 relative" />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Collapsed widget - final position (fixed in corner) */}
-      {state === "collapsed" && (
-        <motion.button
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1, transition: { duration: 0.3 } }}
-          whileHover={{ scale: 1.1 }}
-          style={{
-            position: 'fixed',
-            bottom: '24px',
-            right: '24px',
-            zIndex: 110
+      {/* Fixed Chat Widget - Bottom Right */}
+      <motion.button
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="fixed bottom-8 right-8 w-16 h-16 md:w-20 md:h-20 z-50 group"
+        onClick={handleChatClick}
+        onMouseEnter={() => !showWelcomeCloud && setShowTooltip(true)}
+        onMouseLeave={() => !showWelcomeCloud && setShowTooltip(false)}
+      >
+        {/* Apple-style notification ring */}
+        <motion.div
+          className="absolute inset-0 rounded-full bg-blue-500/30 border-2 border-blue-500/60"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.6, 0.3, 0.6]
           }}
-          className="w-20 h-20 rounded-full bg-primary text-background flex items-center justify-center shadow-2xl transition-transform group relative"
-          onClick={() => setState("expanded")}
-          title="Gaurank AI — Ask me anything!"
-        >
-          {/* Enhanced glow effect */}
-          <motion.div
-            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-            className="absolute inset-0 bg-primary/40 rounded-full blur-lg"
-          />
-          <span className="absolute inline-flex h-full w-full rounded-full bg-primary/60 opacity-75 animate-ping"></span>
-          <Bot className="w-8 h-8 relative" />
-          <div className="absolute -top-16 right-0 bg-black/90 backdrop-blur-sm text-white px-4 py-3 rounded-lg text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-xl border border-white/10">
-            Gaurank AI — Ask me anything!
-            <div className="absolute top-full right-6 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black/90"></div>
-          </div>
-        </motion.button>
-      )}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        
+        {/* Secondary notification ring */}
+        <motion.div
+          className="absolute inset-0 rounded-full bg-blue-400/20 border border-blue-400/40"
+          animate={{
+            scale: [1, 1.4, 1],
+            opacity: [0.4, 0.1, 0.4]
+          }}
+          transition={{
+            duration: 2.5,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.5
+          }}
+        />
 
-      {/* Expanded chat modal */}
-      {state === "expanded" && (
-        <AIChatbot isOpen={true} onClose={() => setState("collapsed")} />
-      )}
+        <BitmojiAvatar className="w-full h-full transition-all duration-apple ease-apple-ease group-hover:scale-105 group-hover:shadow-apple-lg relative z-10" />
+        
+        {/* Welcome Cloud - Apple Messages-style blue cloud (persistent until clicked) */}
+        <AnimatePresence>
+          {showWelcomeCloud && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: -10 }}
+              transition={{ 
+                duration: 0.5, 
+                ease: "easeInOut",
+                exit: { duration: 0.3, ease: "easeInOut" }
+              }}
+              className="absolute bottom-24 right-6 bg-blue-500/95 backdrop-blur-sm rounded-2xl p-4 max-w-xs shadow-lg border border-blue-400/30 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent triggering the button click
+                handleChatClick();
+              }}
+            >
+              {/* Cloud tail pointing to chat icon */}
+              <div className="absolute top-full right-6 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-blue-500/95" />
+              
+              {/* Message content */}
+              <div className="text-white text-sm font-medium leading-snug whitespace-nowrap">
+                Meet Gaurank AI — Ask me anything!
+              </div>
+              
+              {/* Subtle pulse animation to draw attention */}
+              <motion.div
+                className="absolute inset-0 rounded-2xl bg-blue-400/20"
+                animate={{
+                  opacity: [0.3, 0.6, 0.3]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
+        {/* Regular hover tooltip (only when welcome cloud is not showing) */}
+        <AnimatePresence>
+          {showTooltip && !showWelcomeCloud && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.9 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="absolute bottom-full right-0 mb-3 px-4 py-2 bg-appleGlass/90 backdrop-blur-apple rounded-full border border-white/20 shadow-apple-lg text-sm font-medium text-graphite whitespace-nowrap"
+            >
+              Gaurank AI — Ask me anything!
+              {/* Tooltip arrow */}
+              <div className="absolute top-full right-6 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-appleGlass/90" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.button>
+
+      {/* Expanded chat interface */}
+      <AnimatePresence>
+        {showChat && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="fixed inset-4 md:inset-8 z-50"
+          >
+            <div className="w-full h-full backdrop-blur-apple bg-appleGlass/90 rounded-apple-lg border border-white/20 shadow-apple-lg overflow-hidden">
+              <AIChatbot isOpen={showChat} onClose={handleCloseChat} />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }; 

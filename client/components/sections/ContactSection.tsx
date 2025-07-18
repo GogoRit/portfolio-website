@@ -7,7 +7,7 @@ const ContactSection: React.FC = () => {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   return (
     <>
-      <footer id="contact" className="py-20 border-t border-border/50">
+      <footer id="contact" className="pt-16 lg:pt-20 pb-20 border-t border-border/50">
         <div className="container mx-auto px-4">
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-6">

@@ -79,7 +79,7 @@ const timelineItems = [
 ];
 
 const TimelineSection: React.FC = () => (
-  <section id="timeline" className="py-12 lg:py-16 bg-muted/20 min-h-screen">
+  <section id="timeline" className="pt-16 lg:pt-20 pb-16 bg-muted/20 min-h-screen">
     <div className="container mx-auto px-4">
       <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl lg:text-4xl font-bold text-center mb-16">

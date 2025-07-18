@@ -14,10 +14,73 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: [
+          "-apple-system",
+          "BlinkMacSystemFont",
+          'San Francisco',
+          'Helvetica Neue',
+          'Inter',
+          'Segoe UI',
+          'Roboto',
+          'Arial',
+          'sans-serif',
+        ],
         mono: ["JetBrains Mono", "Fira Code", "Consolas", "monospace"],
       },
       colors: {
+        // Apple-inspired palette
+        silver: {
+          light: "#f5f6fa",
+          DEFAULT: "#e5e7eb",
+          dark: "#d1d5db",
+        },
+        graphite: {
+          light: "#43464a",
+          DEFAULT: "#2c2c2e",
+          dark: "#1c1c1e",
+        },
+        blue: {
+          light: "#eaf6ff",
+          DEFAULT: "#007aff",
+          dark: "#004080",
+        },
+        green: {
+          light: "#e6f9ec",
+          DEFAULT: "#30d158",
+          dark: "#248a3d",
+        },
+        pink: {
+          light: "#fce4ec",
+          DEFAULT: "#ff375f",
+          dark: "#c9184a",
+        },
+        purple: {
+          light: "#f3e8ff",
+          DEFAULT: "#af52de",
+          dark: "#5e239d",
+        },
+        yellow: {
+          light: "#fffbe6",
+          DEFAULT: "#ffd60a",
+          dark: "#bfa100",
+        },
+        appleGlass: {
+          DEFAULT: "rgba(255,255,255,0.6)",
+          dark: "rgba(44,44,46,0.6)",
+        },
+        appleAccent: {
+          DEFAULT: "#64d2ff",
+          pastel: "#b6e3ff",
+        },
+        appleBackground: {
+          DEFAULT: "#f8f8f8",
+          dark: "#1c1c1e",
+        },
+        appleForeground: {
+          DEFAULT: "#1c1c1e",
+          light: "#f8f8f8",
+        },
+        // Existing color tokens for compatibility
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -67,10 +130,33 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
+      boxShadow: {
+        'apple-xs': '0 1px 2px 0 rgba(60,60,67,0.03)',
+        'apple-sm': '0 2px 8px 0 rgba(60,60,67,0.07)',
+        'apple-md': '0 4px 16px 0 rgba(60,60,67,0.10)',
+        'apple-lg': '0 8px 32px 0 rgba(60,60,67,0.12)',
+        'apple-glow': '0 0 0 4px #007aff33',
+      },
       borderRadius: {
+        'apple-pill': '9999px',
+        'apple-lg': '1.5rem',
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      transitionTimingFunction: {
+        'apple-ease': 'cubic-bezier(0.4, 0.0, 0.2, 1)',
+        'apple-spring': 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+      },
+      transitionDuration: {
+        'apple': '350ms',
+      },
+      backdropBlur: {
+        'apple': '20px',
+      },
+      spacing: {
+        'apple-nav': '0.75rem',
+        'apple-section': '4.5rem',
       },
       keyframes: {
         "accordion-down": {

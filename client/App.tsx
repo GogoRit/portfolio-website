@@ -11,28 +11,58 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Navigation from "./components/Navigation";
 import { AIWidget } from "./components/AIWidget";
-import { AnimationProvider } from "./contexts/AnimationContext";
+import { AnimationProvider, useAnimation } from "./contexts/AnimationContext";
+import { AppleIntroAnimation } from "./components/AppleIntroAnimation";
+import { MainPageReveal } from "./components/MainPageReveal";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AnimationProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
+const AppContent = () => {
+  const { showMainPage, setShowMainPage } = useAnimation();
+
+  const handleIntroComplete = () => {
+    setShowMainPage(true);
+  };
+
+  return (
+    <>
+      {/* Apple-style intro animation */}
+      {!showMainPage && (
+        <AppleIntroAnimation onComplete={handleIntroComplete} />
+      )}
+      
+      {/* Main content - only render after intro completes */}
+      {showMainPage && (
         <BrowserRouter>
           <Navigation />
           <AIWidget />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <MainPageReveal isVisible={showMainPage}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </MainPageReveal>
         </BrowserRouter>
-      </TooltipProvider>
-    </AnimationProvider>
-  </QueryClientProvider>
-);
+      )}
+    </>
+  );
+};
+
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AnimationProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <AppContent />
+        </TooltipProvider>
+      </AnimationProvider>
+    </QueryClientProvider>
+  );
+};
+
+export default App;
 
 createRoot(document.getElementById("root")!).render(<App />);

@@ -53,7 +53,7 @@ const projects = [
 ];
 
 const ProjectsSection: React.FC = () => (
-  <section id="projects" className="section min-h-screen">
+  <section id="projects" className="pt-16 lg:pt-20 pb-16 min-h-screen">
     <div className="container mx-auto px-4">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-3xl lg:text-4xl font-bold text-center mb-16">
