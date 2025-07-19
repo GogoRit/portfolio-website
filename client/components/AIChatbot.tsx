@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import {
@@ -12,7 +11,9 @@ import {
   X,
   Sparkles,
   Lightbulb,
+  Paperclip,
 } from "lucide-react";
+import { JDUpload } from "./JDUpload";
 
 interface Message {
   id: string;
@@ -37,7 +38,13 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [jdContent, setJdContent] = useState<string | null>(null);
+  const [jdFileName, setJdFileName] = useState<string | null>(null);
+  const [showJDUpload, setShowJDUpload] = useState(true);
+  const [jdCollapsed, setJdCollapsed] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   const quickQuestions = [
     "What is Gaurank currently working on?",
@@ -64,18 +71,48 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
     setInput("");
     setIsTyping(true);
 
+    // Collapse JD area immediately after sending, but keep it visible
+    if (jdContent) {
+      setJdCollapsed(true);
+      // Don't hide the JD upload section completely - keep it as collapsed bar
+      // setShowJDUpload(false); // Remove this line
+    }
+
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input }),
-      });
+      let response;
+      
+      if (jdContent) {
+        // Send with JD content (either file or text)
+        const formData = new FormData();
+        formData.append('message', input);
+        
+        if (jdFileName) {
+          // If we have a file name, treat as file upload
+          // For now, we'll send as text since we don't have the actual file
+          formData.append('jdText', jdContent);
+        } else {
+          // Send as text input
+          formData.append('jdText', jdContent);
+        }
+        
+        response = await fetch("/api/chat", {
+          method: "POST",
+          body: formData,
+        });
+      } else {
+        // Regular chat without JD
+        response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: input }),
+        });
+      }
 
       const data = await response.json();
 
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: data.answer ?? "Sorry, I couldn’t fetch a response.",
+        text: data.answer ?? "Sorry, I couldn't fetch a response.",
         sender: "bot",
         timestamp: new Date(),
       };
@@ -98,15 +135,38 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
     setInput(question);
   };
 
+  const handleJDChange = (content: string | null, fileName?: string) => {
+    setJdContent(content);
+    setJdFileName(fileName || null);
+  };
+
+  const handleJDAutofill = (query: string) => {
+    setInput(query);
+    // Focus the input after a short delay to ensure the component has updated
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setInput(value);
+    
+    // Auto-resize textarea - no internal scrollbar until max height
+    e.target.style.height = "auto";
+    e.target.style.height = Math.min(e.target.scrollHeight, 160) + "px"; // Max height of 160px (h-40)
+  };
+
+  // Auto-scroll to bottom when new bot messages are added (only response area)
   useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+    if (chatEndRef.current && (messages.length > 0 || isTyping)) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isTyping]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md h-[80vh] p-0 gap-0">
+      <DialogContent className="w-11/12 max-w-sm sm:w-80 md:w-96 h-auto max-h-[80vh] sm:h-[400px] md:h-[600px] p-0 gap-0 overflow-hidden">
         <DialogHeader className="p-4 pb-2 border-b border-border/50">
           <DialogTitle className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
@@ -115,14 +175,15 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
             <div>
               <div className="font-semibold">Ask Gaurank AI</div>
               <div className="text-xs text-muted-foreground font-normal">
-                Powered by AI • Based on Gaurank’s real-world experience
+                Powered by AI • Based on Gaurank's real-world experience
               </div>
             </div>
           </DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 flex flex-col min-h-0">
-          <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
+          {/* Messages Area - Auto-scroll only this section */}
+          <ScrollArea className="flex-1 p-4 overflow-y-auto" ref={scrollAreaRef}>
             <div className="space-y-4">
               {messages.map((message) => (
                 <div
@@ -143,39 +204,35 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
                         : "bg-muted text-muted-foreground"
                     }`}
                   >
-                    <p className="text-sm leading-relaxed">{message.text}</p>
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                      {message.text}
+                    </p>
                   </div>
                   {message.sender === "user" && (
                     <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center flex-shrink-0 mt-1">
-                      <User className="w-3 h-3 text-white" />
+                      <Paperclip className="w-3 h-3 text-white" />
                     </div>
                   )}
                 </div>
               ))}
 
               {isTyping && (
-                <div className="flex gap-3">
+                <div className="flex gap-3 justify-start">
                   <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0 mt-1">
                     <Bot className="w-3 h-3 text-white" />
                   </div>
                   <div className="bg-muted text-muted-foreground rounded-2xl px-4 py-2">
-                    <div className="flex gap-1">
-                      <div
-                        className="w-2 h-2 bg-current rounded-full animate-bounce"
-                        style={{ animationDelay: "0ms" }}
-                      ></div>
-                      <div
-                        className="w-2 h-2 bg-current rounded-full animate-bounce"
-                        style={{ animationDelay: "150ms" }}
-                      ></div>
-                      <div
-                        className="w-2 h-2 bg-current rounded-full animate-bounce"
-                        style={{ animationDelay: "300ms" }}
-                      ></div>
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-current rounded-full animate-bounce" />
+                      <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
+                      <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
                     </div>
                   </div>
                 </div>
               )}
+              
+              {/* Auto-scroll anchor */}
+              <div ref={chatEndRef} />
             </div>
           </ScrollArea>
 
@@ -202,17 +259,41 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
             </div>
           )}
 
+          {/* JD Upload Section */}
+          {(showJDUpload || jdContent) && (
+            <div className="p-4 border-t border-border/50">
+              <JDUpload 
+                onJDChange={handleJDChange} 
+                onJDAutofill={handleJDAutofill}
+                isCollapsed={jdCollapsed}
+                className="mb-4" 
+              />
+            </div>
+          )}
+          
           {/* Input Area */}
           <div className="p-4 border-t border-border/50">
             <div className="flex gap-2">
-              <Input
+              <textarea
+                ref={inputRef}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask me anything about Gaurank..."
-                onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                className="flex-1"
+                onChange={handleInputChange}
+                placeholder={jdContent ? "Ask about this job description..." : "Ask me anything about Gaurank..."}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                className="flex-1 resize-none rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[40px] max-h-[160px] overflow-y-auto"
+                rows={1}
+                style={{ 
+                  whiteSpace: "pre-wrap", 
+                  wordBreak: "break-word",
+                  lineHeight: "1.5"
+                }}
               />
-              <Button onClick={handleSend} size="sm" className="px-3">
+              <Button onClick={handleSend} size="sm" className="px-3 self-end">
                 <Send className="w-4 h-4" />
               </Button>
             </div>

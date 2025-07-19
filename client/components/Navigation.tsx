@@ -32,6 +32,16 @@ const AppleIcons = {
       <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
     </svg>
   ),
+  menu: (
+    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+    </svg>
+  ),
+  close: (
+    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+    </svg>
+  ),
 };
 
 const navItems = [
@@ -46,8 +56,10 @@ const navItems = [
 const Navigation: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("#hero");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
   const headerRef = useRef<HTMLElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   // Calculate header height for scroll offset
   useEffect(() => {
@@ -73,6 +85,46 @@ const Navigation: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Close mobile menu on escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isMobileMenuOpen]);
+
+  // Close mobile menu on outside click
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    }
+
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [isMobileMenuOpen]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
   // Smooth scroll function with proper offset
   const smoothScrollToSection = (sectionId: string) => {
     const element = document.querySelector(sectionId);
@@ -93,6 +145,13 @@ const Navigation: React.FC = () => {
     e.preventDefault();
     setActiveSection(href);
     smoothScrollToSection(href);
+    // Close mobile menu after clicking a link
+    setIsMobileMenuOpen(false);
+  };
+
+  // Toggle mobile menu
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   // Intersection Observer for active section detection
@@ -135,57 +194,137 @@ const Navigation: React.FC = () => {
   }, [headerHeight]);
 
   return (
-    <header
-      ref={headerRef}
-      className={`fixed top-0 w-full z-30 transition-all duration-apple ${
-        isScrolled
-          ? "backdrop-blur-apple bg-appleGlass/80 border-b border-silver/20 shadow-apple-sm"
-          : "bg-transparent"
-      }`}
-    >
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        {/* Apple-style Logo / Brand */}
-        <a 
-          href="#hero" 
-          className="flex items-center gap-3 text-xl font-medium"
-          onClick={(e) => handleNavClick(e, "#hero")}
-        >
-          <div className="w-8 h-8 bg-gradient-to-br from-blue to-purple rounded-xl flex items-center justify-center shadow-apple-sm">
-            <span className="text-white text-sm font-semibold">G</span>
-          </div>
-          <span className="text-graphite font-semibold">Gaurank</span>
-        </a>
-        
-        {/* Apple-style Desktop Navigation */}
-        <nav className="hidden md:flex gap-3">
-          {navItems.map((item) => {
-            const isActive = activeSection === item.href;
-            return (
-              <a
-                key={item.href}
-                href={item.href}
-                onClick={(e) => handleNavClick(e, item.href)}
-                className={`relative flex items-center gap-3 px-5 py-3 rounded-apple-pill text-sm font-medium transition-all duration-apple ease-apple-ease hover:scale-105 hover:shadow-apple-sm group ${
-                  isActive 
-                    ? "bg-blue/10 text-blue border border-blue/20 shadow-apple-glow" 
-                    : "text-graphite/70 hover:text-graphite hover:bg-silver/30"
-                }`}
-              >
-                <div className={`transition-all duration-apple ease-apple-ease ${
-                  isActive ? "text-blue" : "text-graphite/70 group-hover:text-graphite"
-                }`}>
-                  {item.icon}
+    <>
+      <header
+        ref={headerRef}
+        className={`fixed top-0 w-full z-30 transition-all duration-apple ${
+          isScrolled
+            ? "backdrop-blur-apple bg-appleGlass/80 border-b border-silver/20 shadow-apple-sm"
+            : "bg-transparent"
+        }`}
+      >
+        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+          {/* Apple-style Logo / Brand */}
+          <a 
+            href="#hero" 
+            className="flex items-center gap-3 text-xl font-medium"
+            onClick={(e) => handleNavClick(e, "#hero")}
+          >
+            <div className="w-8 h-8 bg-gradient-to-br from-blue to-purple rounded-xl flex items-center justify-center shadow-apple-sm">
+              <span className="text-white text-sm font-semibold">G</span>
+            </div>
+            <span className="text-graphite font-semibold">Gaurank</span>
+          </a>
+          
+          {/* Apple-style Desktop Navigation */}
+          <nav className="hidden md:flex gap-3">
+            {navItems.map((item) => {
+              const isActive = activeSection === item.href;
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  onClick={(e) => handleNavClick(e, item.href)}
+                  className={`relative flex items-center gap-3 px-5 py-3 rounded-apple-pill text-sm font-medium transition-all duration-apple ease-apple-ease hover:scale-105 hover:shadow-apple-sm group ${
+                    isActive 
+                      ? "bg-blue/10 text-blue border border-blue/20 shadow-apple-glow" 
+                      : "text-graphite/70 hover:text-graphite hover:bg-silver/30"
+                  }`}
+                >
+                  <div className={`transition-all duration-apple ease-apple-ease ${
+                    isActive ? "text-blue" : "text-graphite/70 group-hover:text-graphite"
+                  }`}>
+                    {item.icon}
+                  </div>
+                  <span className="font-medium">{item.label}</span>
+                  {isActive && (
+                    <div className="absolute inset-0 rounded-apple-pill bg-blue/5 animate-pulse" />
+                  )}
+                </a>
+              );
+            })}
+          </nav>
+
+          {/* Mobile Hamburger Button */}
+          <button
+            className="md:hidden p-2 rounded-apple-pill text-graphite/70 hover:text-graphite hover:bg-silver/30 transition-all duration-apple ease-apple-ease"
+            onClick={toggleMobileMenu}
+            aria-label="Toggle navigation menu"
+            aria-expanded={isMobileMenuOpen}
+          >
+            {isMobileMenuOpen ? AppleIcons.close : AppleIcons.menu}
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile Menu Drawer */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          
+          {/* Mobile Menu */}
+          <div
+            ref={mobileMenuRef}
+            className="absolute top-0 right-0 h-full w-80 bg-white/95 backdrop-blur-apple border-l border-silver/20 shadow-apple-lg transform transition-transform duration-300 ease-in-out"
+            style={{ transform: isMobileMenuOpen ? 'translateX(0)' : 'translateX(100%)' }}
+          >
+            <div className="flex flex-col h-full">
+              {/* Mobile Menu Header */}
+              <div className="flex items-center justify-between p-6 border-b border-silver/20">
+                <span className="text-lg font-semibold text-graphite">Menu</span>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 rounded-apple-pill text-graphite/70 hover:text-graphite hover:bg-silver/30 transition-all duration-apple ease-apple-ease"
+                  aria-label="Close menu"
+                >
+                  {AppleIcons.close}
+                </button>
+              </div>
+
+              {/* Mobile Navigation Links */}
+              <nav className="flex flex-col flex-1 p-6 space-y-4">
+                {navItems.map((item) => {
+                  const isActive = activeSection === item.href;
+                  return (
+                    <a
+                      key={item.href}
+                      href={item.href}
+                      onClick={(e) => handleNavClick(e, item.href)}
+                      className={`flex items-center gap-4 px-4 py-4 rounded-apple-pill text-base font-medium transition-all duration-apple ease-apple-ease hover:scale-105 hover:shadow-apple-sm group ${
+                        isActive 
+                          ? "bg-blue/10 text-blue border border-blue/20 shadow-apple-glow" 
+                          : "text-graphite/70 hover:text-graphite hover:bg-silver/30"
+                      }`}
+                    >
+                      <div className={`transition-all duration-apple ease-apple-ease ${
+                        isActive ? "text-blue" : "text-graphite/70 group-hover:text-graphite"
+                      }`}>
+                        {item.icon}
+                      </div>
+                      <span className="font-medium">{item.label}</span>
+                      {isActive && (
+                        <div className="absolute inset-0 rounded-apple-pill bg-blue/5 animate-pulse" />
+                      )}
+                    </a>
+                  );
+                })}
+              </nav>
+
+              {/* Mobile Menu Footer */}
+              <div className="p-6 border-t border-silver/20">
+                <div className="text-sm text-graphite/60 text-center">
+                  © 2024 Gaurank
                 </div>
-                <span className="font-medium">{item.label}</span>
-                {isActive && (
-                  <div className="absolute inset-0 rounded-apple-pill bg-blue/5 animate-pulse" />
-                )}
-              </a>
-            );
-          })}
-        </nav>
-      </div>
-    </header>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

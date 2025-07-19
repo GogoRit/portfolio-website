@@ -15,6 +15,9 @@ const introTexts = [
   "Try My Own AI To Answer All Queries About Me"
 ];
 
+// Greeting text with inline bitmoji
+const greetingText = "Hello My Future Boss";
+
 // Movie quotes and motivational quotes with authors
 const movieQuotes = [
   { quote: "You want something? Go get it. Period.", author: "— Will Smith" },
@@ -35,12 +38,15 @@ const movieQuotes = [
 ];
 
 export const AppleIntroAnimation: React.FC<AppleIntroAnimationProps> = ({ onComplete }) => {
-  const [currentPhase, setCurrentPhase] = useState<"bitmoji" | "text1" | "text2" | "text3" | "movieQuote" | "complete">("bitmoji");
+  const [currentPhase, setCurrentPhase] = useState<"greeting" | "intro1" | "intro2" | "intro3" | "movieQuote" | "complete">("greeting");
   const [currentQuote, setCurrentQuote] = useState<{ quote: string; author: string }>({ quote: "", author: "" });
   const [typewriterText, setTypewriterText] = useState("");
   const [typewriterAuthor, setTypewriterAuthor] = useState("");
+  const [greetingTypewriter, setGreetingTypewriter] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isTypingComplete, setIsTypingComplete] = useState(false);
+  const [isGreetingTyping, setIsGreetingTyping] = useState(false);
+  const [isGreetingComplete, setIsGreetingComplete] = useState(false);
 
   // Animation sequence timing
   useEffect(() => {
@@ -50,46 +56,70 @@ export const AppleIntroAnimation: React.FC<AppleIntroAnimationProps> = ({ onComp
     const randomQuote = movieQuotes[Math.floor(Math.random() * movieQuotes.length)];
     setCurrentQuote(randomQuote);
 
-    // Phase 1: Bitmoji avatar (0.5s fade in, 1s hold, 0.4s fade out)
-    timers.push(setTimeout(() => {
-      setCurrentPhase("text1");
-    }, 1900)); // 500 + 1000 + 400
+    // Start with greeting typing
+    setIsGreetingTyping(true);
 
-    // Phase 2: Text 1 (0.6s fade in, 1s hold, 0.4s fade out)
+    // Phase 1: Greeting with typewriter effect (first)
+    const greetingLength = greetingText.length;
+    const greetingTypewriterTime = greetingLength * 50 + 1000; // 50ms per char + 1s hold
+    
     timers.push(setTimeout(() => {
-      setCurrentPhase("text2");
-    }, 3900)); // 1900 + 600 + 1000 + 400
+      setCurrentPhase("intro1");
+    }, greetingTypewriterTime)); // Greeting typewriter duration
 
-    // Phase 3: Text 2 (same timing)
+    // Phase 2: Intro text 1 (0.6s fade in, 1s hold, 0.4s fade out)
     timers.push(setTimeout(() => {
-      setCurrentPhase("text3");
-    }, 5900)); // 3900 + 600 + 1000 + 400
+      setCurrentPhase("intro2");
+    }, greetingTypewriterTime + 2000)); // Greeting + 600 + 1000 + 400
 
-    // Phase 4: Text 3 (same timing)
+    // Phase 3: Intro text 2 (same timing)
+    timers.push(setTimeout(() => {
+      setCurrentPhase("intro3");
+    }, greetingTypewriterTime + 4000)); // Greeting + 2000 + 600 + 1000 + 400
+
+    // Phase 4: Intro text 3 (same timing)
     timers.push(setTimeout(() => {
       setCurrentPhase("movieQuote");
       setIsTyping(true);
-    }, 7900)); // 5900 + 600 + 1000 + 400
+    }, greetingTypewriterTime + 6000)); // Greeting + 4000 + 600 + 1000 + 400
 
-    // Phase 5: Wait for typewriter to complete, then fade out
-    // Calculate total typewriter time: quote length + author length + pauses
+    // Phase 5: Movie quote typewriter (last)
     const quoteLength = randomQuote.quote.length;
     const authorLength = randomQuote.author.length;
-    const typewriterTime = (quoteLength + authorLength) * 50 + 500 + 1000; // 50ms per char + 500ms pause + 1s hold
+    const movieTypewriterTime = (quoteLength + authorLength) * 50 + 500 + 1000; // 50ms per char + 500ms pause + 1s hold
     
     timers.push(setTimeout(() => {
       setCurrentPhase("complete");
-    }, 7900 + typewriterTime)); // Start time + typewriter duration
+    }, greetingTypewriterTime + 6000 + movieTypewriterTime)); // Greeting + intro texts + movie typewriter duration
 
     // Complete the animation and call onComplete after fade out is complete
     timers.push(setTimeout(() => {
       onComplete();
-    }, 7900 + typewriterTime + 1000)); // Start time + typewriter duration + fade out duration (increased to 1000ms)
+    }, greetingTypewriterTime + 6000 + movieTypewriterTime + 1000)); // Greeting + intro texts + movie typewriter + fade out duration
 
     return () => {
       timers.forEach(timer => clearTimeout(timer));
     };
   }, [onComplete]);
+
+  // Typewriter effect for greeting
+  useEffect(() => {
+    if (isGreetingTyping && greetingText) {
+      let index = 0;
+      
+      const typeGreeting = () => {
+        if (index <= greetingText.length) {
+          setGreetingTypewriter(greetingText.slice(0, index));
+          index++;
+          setTimeout(typeGreeting, 50); // 50ms per character
+        } else {
+          setIsGreetingComplete(true);
+        }
+      };
+      
+      typeGreeting();
+    }
+  }, [isGreetingTyping, greetingText]);
 
   // Typewriter effect for movie quote
   useEffect(() => {
@@ -132,183 +162,192 @@ export const AppleIntroAnimation: React.FC<AppleIntroAnimationProps> = ({ onComp
         exit={{ opacity: 0 }}
         transition={{ duration: 1.0, ease: "easeInOut" }}
       >
-        {/* Bitmoji Avatar - Static centered, stays until movie quote */}
-        <AnimatePresence>
-          {currentPhase !== "movieQuote" && currentPhase !== "complete" && (
-            <motion.div
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ 
-                opacity: currentPhase === "bitmoji" ? 1 : 0,
-                scale: currentPhase === "bitmoji" ? 1 : 0.8
-              }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-            >
-              {/* Outer glowing ring - Siri-style */}
+        {/* Unified Container for all centered content */}
+        <div className="absolute inset-0 flex items-center justify-center p-4 text-center">
+          
+          {/* Greeting with inline Bitmoji: Center position (FIRST) */}
+          <AnimatePresence>
+            {currentPhase === "greeting" && (
               <motion.div
-                className="absolute inset-0 rounded-full bg-gradient-to-r from-blue/40 to-purple/40 blur-lg"
-                animate={{
-                  opacity: [0.3, 0.6, 0.3],
-                  scale: [1, 1.2, 1]
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
-              
-              {/* 3D shadow layer for depth */}
-              <div className="absolute inset-0 rounded-full bg-black/20 blur-md transform translate-y-1" />
-              
-              {/* Glass container with enhanced depth */}
-              <div className="relative w-full h-full rounded-full backdrop-blur-apple bg-white/20 border border-white/30 shadow-apple-lg overflow-hidden">
-                {/* Bitmoji image with mask for background removal */}
-                <div className="w-full h-full rounded-full overflow-hidden">
-                  <img
-                    src={BITMOJI_AVATAR}
-                    alt="AI Assistant Avatar"
-                    className="w-full h-full object-cover object-center"
-                    style={{
-                      maskImage: 'radial-gradient(circle, black 60%, transparent 100%)',
-                      WebkitMaskImage: 'radial-gradient(circle, black 60%, transparent 100%)'
-                    }}
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23007aff'/%3E%3Cpath d='M30 40c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10-10-4.5-10-10zm20 0c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10-10-4.5-10-10z' fill='white'/%3E%3C/svg%3E";
-                    }}
-                  />
-                </div>
-              </div>
-              
-              {/* Inner pulse - enhanced glow */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue/20 to-purple/20 animate-pulse" />
-              
-              {/* Additional 3D highlight */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/30 to-transparent opacity-60" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Text 1: Left-top position */}
-        <AnimatePresence>
-          {currentPhase === "text1" && (
-            <motion.div
-              className="absolute top-16 left-8 text-left"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.2 }}
-              transition={{ 
-                duration: 0.6,
-                ease: "easeOut"
-              }}
-            >
-              <div 
-                className="font-bold max-w-lg backdrop-blur-sm"
-                style={{ 
-                  fontFamily: '-apple-system, "SF Pro Display", system-ui, sans-serif',
-                  fontSize: 'clamp(1.5rem, 4vw, 3.5rem)',
-                  color: 'rgba(63, 61, 61, 0.85)',
-                  textShadow: '0 0 1px rgba(117, 113, 113, 0.5)'
+                className="flex items-center justify-center gap-4"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.2 }}
+                transition={{ 
+                  duration: 0.6,
+                  ease: "easeOut"
                 }}
               >
-                Hi, <span className="text-blue/90">Welcome</span> To My Portfolio
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Text 2: Right-center position */}
-        <AnimatePresence>
-          {currentPhase === "text2" && (
-            <motion.div
-              className="absolute top-1/2 right-8 transform -translate-y-1/2 text-right"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.2 }}
-              transition={{ 
-                duration: 0.6,
-                ease: "easeOut"
-              }}
-            >
-              <div 
-                className="font-bold max-w-lg backdrop-blur-sm"
-                style={{ 
-                  fontFamily: '-apple-system, "SF Pro Display", system-ui, sans-serif',
-                  fontSize: 'clamp(1.25rem, 3.5vw, 3rem)',
-                  color: 'rgba(63, 61, 61, 0.85)',
-                  textShadow: '0 0 1px rgba(117, 113, 113, 0.5)'
-                }}
-              >
-                This Portfolio Isn't Static — It Thinks, Talks, and <span className="text-blue/85">Adapts</span>.
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Text 3: Bottom-center position */}
-        <AnimatePresence>
-          {currentPhase === "text3" && (
-            <motion.div
-              className="absolute bottom-16 left-1/2 transform -translate-x-1/2 text-center"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.2 }}
-              transition={{ 
-                duration: 0.6,
-                ease: "easeOut"
-              }}
-            >
-              <div 
-                className="font-bold max-w-3xl backdrop-blur-sm"
-                style={{ 
-                  fontFamily: '-apple-system, "SF Pro Display", system-ui, sans-serif',
-                  fontSize: 'clamp(1.25rem, 3.5vw, 3rem)',
-                  color: 'rgba(63, 61, 61, 0.85)',
-                  textShadow: '0 0 1px rgba(117, 113, 113, 0.5)'
-                }}
-              >
-                Try My Own <span className="text-blue/90">AI</span> To Answer All Queries About Me
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Movie Quote: Center position with typewriter effect */}
-        <AnimatePresence>
-          {currentPhase === "movieQuote" && (
-            <motion.div
-              className="absolute inset-0 flex items-center justify-center p-4 text-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ 
-                duration: 0.6,
-                ease: "easeOut"
-              }}
-            >
-              <div 
-                className="font-normal text-graphite/70 max-w-4xl px-8 backdrop-blur-sm"
-                style={{ 
-                  fontFamily: '-apple-system, "SF Pro Display", system-ui, sans-serif',
-                  fontSize: 'clamp(1.2rem, 3vw, 2.5rem)'
-                }}
-              >
-                "{typewriterText}"
                 <div 
-                  className="font-normal text-graphite/60 mt-4"
+                  className="font-bold max-w-3xl backdrop-blur-sm"
                   style={{ 
                     fontFamily: '-apple-system, "SF Pro Display", system-ui, sans-serif',
-                    fontSize: 'clamp(1rem, 2.5vw, 2rem)'
+                    fontSize: 'clamp(1.5rem, 4vw, 3.5rem)',
+                    color: 'rgba(63, 61, 61, 0.85)',
+                    textShadow: '0 0 1px rgba(117, 113, 113, 0.5)'
                   }}
                 >
-                  {typewriterAuthor}
+                  Hello My Future <span className="text-blue/90">Boss</span>
                 </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                
+                {/* Inline Bitmoji with glow effect */}
+                <motion.div
+                  className="relative"
+                  animate={isGreetingComplete ? {
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 5, -5, 0]
+                  } : {}}
+                  transition={{
+                    duration: 0.6,
+                    ease: "easeInOut"
+                  }}
+                >
+                  {/* Subtle blue glowing wave animation */}
+                  <div className="absolute inset-0 rounded-full bg-blue-400/30 animate-ping" />
+                  
+                  {/* Glass container with enhanced depth */}
+                  <div className="relative w-16 h-16 rounded-full backdrop-blur-apple bg-white/20 border border-white/30 shadow-apple-lg overflow-hidden">
+                    <img
+                      src={BITMOJI_AVATAR}
+                      alt="AI Assistant Avatar"
+                      className="w-full h-full object-cover object-center"
+                      style={{
+                        maskImage: 'radial-gradient(circle, black 60%, transparent 100%)',
+                        WebkitMaskImage: 'radial-gradient(circle, black 60%, transparent 100%)'
+                      }}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23007aff'/%3E%3Cpath d='M30 40c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10-10-4.5-10-10zm20 0c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10-10-4.5-10-10z' fill='white'/%3E%3C/svg%3E";
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Inner pulse - enhanced glow */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue/20 to-purple/20 animate-pulse" />
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Intro Text 1: Left-top position */}
+          <AnimatePresence>
+            {currentPhase === "intro1" && (
+              <motion.div
+                className="absolute top-16 left-8 text-left"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.2 }}
+                transition={{ 
+                  duration: 0.6,
+                  ease: "easeOut"
+                }}
+              >
+                <div 
+                  className="font-bold max-w-lg backdrop-blur-sm"
+                  style={{ 
+                    fontFamily: '-apple-system, "SF Pro Display", system-ui, sans-serif',
+                    fontSize: 'clamp(1.5rem, 4vw, 3.5rem)',
+                    color: 'rgba(63, 61, 61, 0.85)',
+                    textShadow: '0 0 1px rgba(117, 113, 113, 0.5)'
+                  }}
+                >
+                  Hi, <span className="text-blue/90">Welcome</span> To My Portfolio
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Intro Text 2: Right-center position */}
+          <AnimatePresence>
+            {currentPhase === "intro2" && (
+              <motion.div
+                className="absolute top-1/2 right-8 transform -translate-y-1/2 text-right"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.2 }}
+                transition={{ 
+                  duration: 0.6,
+                  ease: "easeOut"
+                }}
+              >
+                <div 
+                  className="font-bold max-w-lg backdrop-blur-sm"
+                  style={{ 
+                    fontFamily: '-apple-system, "SF Pro Display", system-ui, sans-serif',
+                    fontSize: 'clamp(1.25rem, 3.5vw, 3rem)',
+                    color: 'rgba(63, 61, 61, 0.85)',
+                    textShadow: '0 0 1px rgba(117, 113, 113, 0.5)'
+                  }}
+                >
+                  This Portfolio Isn't Static — It Thinks, Talks, and <span className="text-blue/85">Adapts</span>.
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Intro Text 3: Bottom-center position */}
+          <AnimatePresence>
+            {currentPhase === "intro3" && (
+              <motion.div
+                className="absolute bottom-16 left-1/2 transform -translate-x-1/2 text-center"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.2 }}
+                transition={{ 
+                  duration: 0.6,
+                  ease: "easeOut"
+                }}
+              >
+                <div 
+                  className="font-bold max-w-3xl backdrop-blur-sm"
+                  style={{ 
+                    fontFamily: '-apple-system, "SF Pro Display", system-ui, sans-serif',
+                    fontSize: 'clamp(1.25rem, 3.5vw, 3rem)',
+                    color: 'rgba(63, 61, 61, 0.85)',
+                    textShadow: '0 0 1px rgba(117, 113, 113, 0.5)'
+                  }}
+                >
+                  Try My Own <span className="text-blue/90">AI</span> To Answer All Queries About Me
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Movie Quote: Same center position (LAST) */}
+          <AnimatePresence>
+            {currentPhase === "movieQuote" && (
+              <motion.div
+                className="max-w-4xl px-8 backdrop-blur-sm"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ 
+                  duration: 0.6,
+                  ease: "easeOut"
+                }}
+              >
+                <div 
+                  className="font-normal text-graphite/70"
+                  style={{ 
+                    fontFamily: '-apple-system, "SF Pro Display", system-ui, sans-serif',
+                    fontSize: 'clamp(1.2rem, 3vw, 2.5rem)'
+                  }}
+                >
+                  "{typewriterText}"
+                  <div 
+                    className="font-normal text-graphite/60 mt-4"
+                    style={{ 
+                      fontFamily: '-apple-system, "SF Pro Display", system-ui, sans-serif',
+                      fontSize: 'clamp(1rem, 2.5vw, 2rem)'
+                    }}
+                  >
+                    {typewriterAuthor}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* Fade out overlay - only when completing */}
         {currentPhase === "complete" && (

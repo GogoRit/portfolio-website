@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
 import { AIChatbot } from "./AIChatbot";
 import { useAnimation } from "../contexts/AnimationContext";
 
@@ -10,8 +10,63 @@ export const AIWidget: React.FC = () => {
   const [showChat, setShowChat] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [showWelcomeCloud, setShowWelcomeCloud] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const [widgetDimensions, setWidgetDimensions] = useState({ width: 80, height: 80 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState<'left' | 'right' | 'top' | 'bottom'>('left');
   const { showMainPage } = useAnimation();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const tooltipTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const controls = useAnimationControls();
+  const widgetRef = useRef<HTMLDivElement>(null);
+
+  // Define margin constant for consistent edge padding
+  const MARGIN = 16;
+  const NAVBAR_HEIGHT = 80; // Approximate height of the navigation bar
+
+  // Ensure we're on the client side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Calculate widget dimensions and set initial position to bottom-right
+  useEffect(() => {
+    if (isClient && widgetRef.current) {
+      const rect = widgetRef.current.getBoundingClientRect();
+      setWidgetDimensions({ width: rect.width, height: rect.height });
+      
+      // Always initialize at bottom-right corner with proper margins
+      // Account for navbar height at the top
+      const initialX = window.innerWidth - rect.width - MARGIN;
+      const initialY = window.innerHeight - rect.height - MARGIN;
+      
+      console.log('AIWidget: Setting initial position:', { initialX, initialY, windowWidth: window.innerWidth, windowHeight: window.innerHeight });
+      
+      // Add a small delay to ensure the widget is rendered before setting position
+      setTimeout(() => {
+        controls.set({ x: initialX, y: initialY });
+        console.log('AIWidget: Controls set to:', { x: initialX, y: initialY });
+      }, 100);
+    }
+  }, [isClient, controls, MARGIN]);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (widgetRef.current) {
+        const rect = widgetRef.current.getBoundingClientRect();
+        setWidgetDimensions({ width: rect.width, height: rect.height });
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (tooltipTimerRef.current) {
+        clearTimeout(tooltipTimerRef.current);
+      }
+    };
+  }, []);
 
   // Persistent welcome cloud logic - shows after intro and stays until clicked
   useEffect(() => {
@@ -57,6 +112,110 @@ export const AIWidget: React.FC = () => {
     setShowChat(false);
   };
 
+  // Handle mouse enter with delay for tooltip
+  const handleMouseEnter = () => {
+    if (!showWelcomeCloud && !isDragging) {
+      // Clear any existing timer
+      if (tooltipTimerRef.current) {
+        clearTimeout(tooltipTimerRef.current);
+      }
+      // Show tooltip after 300ms delay
+      tooltipTimerRef.current = setTimeout(() => {
+        setShowTooltip(true);
+      }, 300);
+    }
+  };
+
+  // Handle mouse leave - immediate hide
+  const handleMouseLeave = () => {
+    if (tooltipTimerRef.current) {
+      clearTimeout(tooltipTimerRef.current);
+    }
+    setShowTooltip(false);
+  };
+
+  // Handle drag end - snap to nearest edge and calculate tooltip position
+  const handleDragEnd = (event: any, info: any) => {
+    if (!widgetRef.current) return;
+    
+    setIsDragging(false);
+    setShowTooltip(false); // Reset tooltip on drag end
+    
+    const { width: widgetWidth, height: widgetHeight } = widgetDimensions;
+    const { x, y } = info.point;
+    
+    // Calculate distances to each edge with margin consideration
+    const leftDist = x - MARGIN;
+    const rightDist = (window.innerWidth - MARGIN) - (x + widgetWidth);
+    const topDist = y - (NAVBAR_HEIGHT + MARGIN);
+    const bottomDist = (window.innerHeight - MARGIN) - (y + widgetHeight);
+    
+    // Find the minimum distance to determine nearest edge
+    const distances = [
+      { edge: 'left', distance: leftDist },
+      { edge: 'right', distance: rightDist },
+      { edge: 'top', distance: topDist },
+      { edge: 'bottom', distance: bottomDist }
+    ];
+    
+    const nearestEdge = distances.reduce((min, current) => 
+      current.distance < min.distance ? current : min
+    );
+    
+    // Calculate target position based on nearest edge with proper margins
+    let targetX = x;
+    let targetY = y;
+    
+    // Special handling for bottom-right corner and bottom edge
+    const isNearBottom = bottomDist < 100; // Within 100px of bottom
+    const isNearRight = rightDist < 100; // Within 100px of right
+    
+    if (isNearBottom && isNearRight) {
+      // Bottom-right corner: position above and to the left of the widget
+      targetX = window.innerWidth - widgetWidth - MARGIN;
+      targetY = window.innerHeight - widgetHeight - MARGIN;
+      setTooltipPosition('top-left'); // Tooltip above and to the left when widget is at bottom-right
+    } else if (isNearBottom) {
+      // Near bottom edge: always position above
+      targetY = window.innerHeight - widgetHeight - MARGIN;
+      setTooltipPosition('top'); // Tooltip above when widget is near bottom
+    } else {
+      switch (nearestEdge.edge) {
+        case 'left':
+          targetX = MARGIN;
+          setTooltipPosition('right'); // Tooltip on right when widget is on left
+          break;
+        case 'right':
+          targetX = window.innerWidth - widgetWidth - MARGIN;
+          setTooltipPosition('left'); // Tooltip on left when widget is on right
+          break;
+        case 'top':
+          targetY = NAVBAR_HEIGHT + MARGIN; // Snap below navbar
+          setTooltipPosition('bottom'); // Tooltip below when widget is on top
+          break;
+        case 'bottom':
+          targetY = window.innerHeight - widgetHeight - MARGIN;
+          setTooltipPosition('top'); // Tooltip above when widget is on bottom
+          break;
+      }
+    }
+    
+    // Clamp position to keep widget in viewport with margins
+    targetX = Math.max(MARGIN, Math.min(targetX, window.innerWidth - widgetWidth - MARGIN));
+    targetY = Math.max(NAVBAR_HEIGHT + MARGIN, Math.min(targetY, window.innerHeight - widgetHeight - MARGIN));
+    
+    // Animate to snapped position
+    controls.start({
+      x: targetX,
+      y: targetY,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30
+      }
+    });
+  };
+
   // Apple-style Bitmoji Avatar Component with 3D effects
   const BitmojiAvatar = ({ className = "" }: { className?: string }) => (
     <div className={`relative ${className}`}>
@@ -85,13 +244,13 @@ export const AIWidget: React.FC = () => {
             src={BITMOJI_AVATAR}
             alt="AI Assistant Avatar"
             className="w-full h-full object-cover object-center"
-            style={{
-              maskImage: 'radial-gradient(circle, black 60%, transparent 100%)',
-              WebkitMaskImage: 'radial-gradient(circle, black 60%, transparent 100%)'
-            }}
             onError={(e) => {
+              console.log('AIWidget: Bitmoji image failed to load, using fallback');
               const target = e.target as HTMLImageElement;
               target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23007aff'/%3E%3Cpath d='M30 40c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10-10-4.5-10-10zm20 0c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10-10-4.5-10-10z' fill='white'/%3E%3C/svg%3E";
+            }}
+            onLoad={() => {
+              console.log('AIWidget: Bitmoji image loaded successfully');
             }}
           />
         </div>
@@ -105,110 +264,179 @@ export const AIWidget: React.FC = () => {
     </div>
   );
 
+  // Don't render until we're on the client side
+  if (!isClient) {
+    return null;
+  }
+
+  const calculatedX = window.innerWidth - 80 - MARGIN;
+  const calculatedY = window.innerHeight - 80 - MARGIN;
+  console.log('AIWidget: Rendering widget, isClient:', isClient, 'showMainPage:', showMainPage, 'widgetDimensions:', widgetDimensions);
+  console.log('AIWidget: Calculated position:', { calculatedX, calculatedY, windowWidth: window.innerWidth, windowHeight: window.innerHeight });
+
   return (
     <>
-      {/* Fixed Chat Widget - Bottom Right */}
-      <motion.button
+
+
+            {/* Draggable Chat Widget - Bottom Right */}
+      <motion.div
+        ref={widgetRef}
         initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="fixed bottom-8 right-8 w-16 h-16 md:w-20 md:h-20 z-50 group"
-        onClick={handleChatClick}
-        onMouseEnter={() => !showWelcomeCloud && setShowTooltip(true)}
-        onMouseLeave={() => !showWelcomeCloud && setShowTooltip(false)}
+        animate={{ 
+          opacity: 1, 
+          scale: 1,
+          x: window.innerWidth - 80 - MARGIN,
+          y: window.innerHeight - 80 - MARGIN
+        }}
+        drag
+        dragConstraints={{ 
+          top: NAVBAR_HEIGHT + MARGIN, // Start below navbar
+          left: MARGIN,
+          right: window.innerWidth - 80 - MARGIN,
+          bottom: window.innerHeight - 80 - MARGIN
+        }}
+        dragElastic={0.2}
+        onDragStart={() => setIsDragging(true)}
+        onDragEnd={handleDragEnd}
+        whileDrag={{ 
+          cursor: 'grabbing',
+          zIndex: 9999,
+          scale: 1.05
+        }}
+        whileHover={{ 
+          cursor: 'grab',
+          scale: 1.02
+        }}
+        className="fixed w-16 h-16 md:w-20 md:h-20 z-[9999] cursor-grab"
+        style={{ 
+          touchAction: 'none'
+        }}
       >
-        {/* Apple-style notification ring */}
-        <motion.div
-          className="absolute inset-0 rounded-full bg-blue-500/30 border-2 border-blue-500/60"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.6, 0.3, 0.6]
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        
-        {/* Secondary notification ring */}
-        <motion.div
-          className="absolute inset-0 rounded-full bg-blue-400/20 border border-blue-400/40"
-          animate={{
-            scale: [1, 1.4, 1],
-            opacity: [0.4, 0.1, 0.4]
-          }}
-          transition={{
-            duration: 2.5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.5
-          }}
-        />
 
-        <BitmojiAvatar className="w-full h-full transition-all duration-apple ease-apple-ease group-hover:scale-105 group-hover:shadow-apple-lg relative z-10" />
-        
-        {/* Welcome Cloud - Apple Messages-style blue cloud (persistent until clicked) */}
-        <AnimatePresence>
-          {showWelcomeCloud && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.8, y: -10 }}
-              transition={{ 
-                duration: 0.5, 
-                ease: "easeInOut",
-                exit: { duration: 0.3, ease: "easeInOut" }
-              }}
-              className="absolute bottom-24 right-6 bg-blue-500/95 backdrop-blur-sm rounded-2xl p-4 max-w-xs shadow-lg border border-blue-400/30 cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation(); // Prevent triggering the button click
-                handleChatClick();
-              }}
-            >
-              {/* Cloud tail pointing to chat icon */}
-              <div className="absolute top-full right-6 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-blue-500/95" />
-              
-              {/* Message content */}
-              <div className="text-white text-sm font-medium leading-snug whitespace-nowrap">
-                Meet Gaurank AI — Ask me anything!
-              </div>
-              
-              {/* Subtle pulse animation to draw attention */}
+          
+          <motion.button
+            className="w-full h-full group"
+            onClick={handleChatClick}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+          {/* Apple-style notification ring */}
+          <motion.div
+            className="absolute inset-0 rounded-full bg-blue-500/30 border-2 border-blue-500/60"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.6, 0.3, 0.6]
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          
+          {/* Secondary notification ring */}
+          <motion.div
+            className="absolute inset-0 rounded-full bg-blue-400/20 border border-blue-400/40"
+            animate={{
+              scale: [1, 1.4, 1],
+              opacity: [0.4, 0.1, 0.4]
+            }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 0.5
+            }}
+          />
+
+          <BitmojiAvatar className="w-full h-full transition-all duration-apple ease-apple-ease group-hover:scale-105 group-hover:shadow-apple-lg relative z-10" />
+          
+          {/* Welcome Cloud - Apple Messages-style blue cloud (persistent until clicked) */}
+          <AnimatePresence>
+            {showWelcomeCloud && (
               <motion.div
-                className="absolute inset-0 rounded-2xl bg-blue-400/20"
-                animate={{
-                  opacity: [0.3, 0.6, 0.3]
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8, y: -10 }}
+                transition={{ 
+                  duration: 0.5, 
+                  ease: "easeInOut",
+                  exit: { duration: 0.3, ease: "easeInOut" }
                 }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
+                className="absolute bottom-24 right-6 bg-blue-500/95 backdrop-blur-sm rounded-2xl p-4 max-w-xs shadow-lg border border-blue-400/30 cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent triggering the button click
+                  handleChatClick();
                 }}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-        
-        {/* Regular hover tooltip (only when welcome cloud is not showing) */}
-        <AnimatePresence>
-          {showTooltip && !showWelcomeCloud && (
-            <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.9 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              className="absolute bottom-full right-0 mb-3 px-4 py-2 bg-appleGlass/90 backdrop-blur-apple rounded-full border border-white/20 shadow-apple-lg text-sm font-medium text-graphite whitespace-nowrap"
-            >
-              Gaurank AI — Ask me anything!
-              {/* Tooltip arrow */}
-              <div className="absolute top-full right-6 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-appleGlass/90" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.button>
+              >
+                {/* Cloud tail pointing to chat icon */}
+                <div className="absolute top-full right-6 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-blue-500/95" />
+                
+                {/* Message content */}
+                <div className="text-white text-sm font-medium leading-snug whitespace-nowrap">
+                  Meet Gaurank AI — Ask me anything!
+                </div>
+                
+                {/* Subtle pulse animation to draw attention */}
+                <motion.div
+                  className="absolute inset-0 rounded-2xl bg-blue-400/20"
+                  animate={{
+                    opacity: [0.3, 0.6, 0.3]
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          {/* Dynamic hover tooltip with edge-aware positioning */}
+          <AnimatePresence>
+            {showTooltip && !showWelcomeCloud && !isDragging && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className={`absolute px-4 py-3 bg-appleGlass/95 backdrop-blur-apple rounded-apple-lg border border-white/30 shadow-apple-lg text-sm font-medium text-graphite max-w-xs whitespace-nowrap ${
+                  tooltipPosition === 'left' ? 'right-full mr-3 top-1/2 -translate-y-1/2' :
+                  tooltipPosition === 'right' ? 'left-full ml-3 top-1/2 -translate-y-1/2' :
+                  tooltipPosition === 'top' ? 'bottom-full mb-3 left-1/2 -translate-x-1/2' :
+                  tooltipPosition === 'top-left' ? 'bottom-full mb-3 right-0' :
+                  'top-full mt-3 left-1/2 -translate-x-1/2'
+                }`}
+                style={{
+                  minWidth: '200px',
+                  maxWidth: '280px'
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                  <span className="text-graphite font-medium">Gaurank AI</span>
+                </div>
+                <div className="text-graphite/80 text-xs mt-1">
+                  Ask me anything!
+                </div>
+                {/* Dynamic tooltip arrow */}
+                <div className={`absolute w-0 h-0 border-4 border-transparent ${
+                  tooltipPosition === 'left' ? 'left-full border-l-appleGlass/95 -right-1 top-1/2 -translate-y-1/2' :
+                  tooltipPosition === 'right' ? 'right-full border-r-appleGlass/95 -left-1 top-1/2 -translate-y-1/2' :
+                  tooltipPosition === 'top' ? 'top-full border-t-appleGlass/95 -bottom-1 left-1/2 -translate-x-1/2' :
+                  tooltipPosition === 'top-left' ? 'top-full border-t-appleGlass/95 -bottom-1 right-4' :
+                  'bottom-full border-b-appleGlass/95 -top-1 left-1/2 -translate-x-1/2'
+                }`} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.button>
+      </motion.div>
 
-      {/* Expanded chat interface */}
+      {/* Responsive Expanded Chat Interface */}
       <AnimatePresence>
         {showChat && (
           <motion.div
@@ -216,7 +444,24 @@ export const AIWidget: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="fixed inset-4 md:inset-8 z-50"
+            className="fixed z-50 inset-4 sm:inset-8 md:inset-12"
+            style={{
+              // Mobile: full-width bottom drawer
+              // Desktop: positioned relative to widget
+              ...(window.innerWidth < 640 ? {
+                inset: '0.5rem',
+                width: 'calc(100% - 1rem)',
+                height: 'calc(100% - 1rem)',
+                maxHeight: '70vh'
+              } : {
+                bottom: '6rem',
+                right: '1.5rem',
+                width: '11/12',
+                maxWidth: '24rem',
+                height: 'auto',
+                maxHeight: '80vh'
+              })
+            }}
           >
             <div className="w-full h-full backdrop-blur-apple bg-appleGlass/90 rounded-apple-lg border border-white/20 shadow-apple-lg overflow-hidden">
               <AIChatbot isOpen={showChat} onClose={handleCloseChat} />
