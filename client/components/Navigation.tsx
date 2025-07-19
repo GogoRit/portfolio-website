@@ -60,6 +60,7 @@ const Navigation: React.FC = () => {
   const [headerHeight, setHeaderHeight] = useState(0);
   const headerRef = useRef<HTMLElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
 
   // Calculate header height for scroll offset
   useEffect(() => {
@@ -97,19 +98,28 @@ const Navigation: React.FC = () => {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isMobileMenuOpen]);
 
-  // Close mobile menu on outside click
+  // Global click handler to close mobile menu when clicking anywhere
   useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
+    const handleGlobalClick = (e: MouseEvent) => {
+      if (isMobileMenuOpen) {
+        // Don't close if clicking on the hamburger button itself
+        if (hamburgerRef.current && hamburgerRef.current.contains(e.target as Node)) {
+          return;
+        }
+        // Don't close if clicking inside the mobile menu
+        if (mobileMenuRef.current && mobileMenuRef.current.contains(e.target as Node)) {
+          return;
+        }
+        // Close the menu for any other click
         setIsMobileMenuOpen(false);
       }
     };
 
     if (isMobileMenuOpen) {
-      document.addEventListener('mousedown', handleOutsideClick);
+      document.addEventListener('click', handleGlobalClick);
     }
 
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('click', handleGlobalClick);
   }, [isMobileMenuOpen]);
 
   // Prevent body scroll when mobile menu is open
@@ -245,85 +255,111 @@ const Navigation: React.FC = () => {
             })}
           </nav>
 
-          {/* Mobile Hamburger Button */}
+          {/* Mobile Hamburger Button with smooth animation */}
           <button
-            className="md:hidden p-2 rounded-apple-pill text-graphite/70 hover:text-graphite hover:bg-silver/30 transition-all duration-apple ease-apple-ease"
+            ref={hamburgerRef}
+            className="md:hidden p-2 rounded-apple-pill text-graphite/70 hover:text-graphite hover:bg-silver/30 transition-all duration-300 ease-out"
             onClick={toggleMobileMenu}
             aria-label="Toggle navigation menu"
             aria-expanded={isMobileMenuOpen}
           >
-            {isMobileMenuOpen ? AppleIcons.close : AppleIcons.menu}
+            <div className={`transition-all duration-300 ease-out transform ${
+              isMobileMenuOpen ? 'rotate-180 scale-110' : 'rotate-0 scale-100'
+            }`}>
+              {isMobileMenuOpen ? AppleIcons.close : AppleIcons.menu}
+            </div>
           </button>
         </div>
       </header>
 
-      {/* Mobile Menu Drawer */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
-          {/* Backdrop */}
-          <div 
-            className="absolute inset-0 bg-black/20 backdrop-blur-sm"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-          
-          {/* Mobile Menu */}
-          <div
-            ref={mobileMenuRef}
-            className="absolute top-0 right-0 h-full w-80 bg-white/95 backdrop-blur-apple border-l border-silver/20 shadow-apple-lg transform transition-transform duration-300 ease-in-out"
-            style={{ transform: isMobileMenuOpen ? 'translateX(0)' : 'translateX(100%)' }}
-          >
-            <div className="flex flex-col h-full">
-              {/* Mobile Menu Header */}
-              <div className="flex items-center justify-between p-6 border-b border-silver/20">
-                <span className="text-lg font-semibold text-graphite">Menu</span>
-                <button
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 rounded-apple-pill text-graphite/70 hover:text-graphite hover:bg-silver/30 transition-all duration-apple ease-apple-ease"
-                  aria-label="Close menu"
-                >
-                  {AppleIcons.close}
-                </button>
-              </div>
+      {/* Mobile Menu Drawer with improved animations */}
+      <div className={`fixed inset-0 z-40 md:hidden transition-all duration-300 ease-out ${
+        isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+      }`}>
+        {/* Backdrop with smooth fade */}
+        <div 
+          className={`absolute inset-0 bg-black/20 backdrop-blur-sm transition-all duration-300 ease-out ${
+            isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
+          }`}
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+        
+        {/* Mobile Menu with smooth slide animation */}
+        <div
+          ref={mobileMenuRef}
+          className={`absolute top-0 right-0 h-full w-80 bg-white/95 backdrop-blur-apple border-l border-silver/20 shadow-apple-lg transform transition-all duration-300 ease-out ${
+            isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
+          <div className="flex flex-col h-full">
+            {/* Mobile Menu Header */}
+            <div className="flex items-center justify-between p-6 border-b border-silver/20">
+              <span className="text-lg font-semibold text-graphite">Menu</span>
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-2 rounded-apple-pill text-graphite/70 hover:text-graphite hover:bg-silver/30 transition-all duration-300 ease-out hover:scale-110"
+                aria-label="Close menu"
+              >
+                {AppleIcons.close}
+              </button>
+            </div>
 
-              {/* Mobile Navigation Links */}
-              <nav className="flex flex-col flex-1 p-6 space-y-4">
-                {navItems.map((item) => {
-                  const isActive = activeSection === item.href;
-                  return (
-                    <a
-                      key={item.href}
-                      href={item.href}
-                      onClick={(e) => handleNavClick(e, item.href)}
-                      className={`flex items-center gap-4 px-4 py-4 rounded-apple-pill text-base font-medium transition-all duration-apple ease-apple-ease hover:scale-105 hover:shadow-apple-sm group ${
-                        isActive 
-                          ? "bg-blue/10 text-blue border border-blue/20 shadow-apple-glow" 
-                          : "text-graphite/70 hover:text-graphite hover:bg-silver/30"
-                      }`}
-                    >
-                      <div className={`transition-all duration-apple ease-apple-ease ${
-                        isActive ? "text-blue" : "text-graphite/70 group-hover:text-graphite"
-                      }`}>
-                        {item.icon}
-                      </div>
-                      <span className="font-medium">{item.label}</span>
-                      {isActive && (
-                        <div className="absolute inset-0 rounded-apple-pill bg-blue/5 animate-pulse" />
-                      )}
-                    </a>
-                  );
-                })}
-              </nav>
+            {/* Mobile Navigation Links */}
+            <nav className="flex flex-col flex-1 p-6 space-y-4">
+              {navItems.map((item, index) => {
+                const isActive = activeSection === item.href;
+                return (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    onClick={(e) => handleNavClick(e, item.href)}
+                    className={`flex items-center gap-4 px-4 py-4 rounded-apple-pill text-base font-medium transition-all duration-300 ease-out hover:scale-105 hover:shadow-apple-sm group ${
+                      isActive 
+                        ? "bg-blue/10 text-blue border border-blue/20 shadow-apple-glow" 
+                        : "text-graphite/70 hover:text-graphite hover:bg-silver/30"
+                    }`}
+                    style={{
+                      animationDelay: `${index * 50}ms`,
+                      animation: isMobileMenuOpen ? 'slideInRight 0.3s ease-out forwards' : 'none'
+                    }}
+                  >
+                    <div className={`transition-all duration-300 ease-out ${
+                      isActive ? "text-blue" : "text-graphite/70 group-hover:text-graphite"
+                    }`}>
+                      {item.icon}
+                    </div>
+                    <span className="font-medium">{item.label}</span>
+                    {isActive && (
+                      <div className="absolute inset-0 rounded-apple-pill bg-blue/5 animate-pulse" />
+                    )}
+                  </a>
+                );
+              })}
+            </nav>
 
-              {/* Mobile Menu Footer */}
-              <div className="p-6 border-t border-silver/20">
-                <div className="text-sm text-graphite/60 text-center">
-                  © 2024 Gaurank
-                </div>
+            {/* Mobile Menu Footer */}
+            <div className="p-6 border-t border-silver/20">
+              <div className="text-sm text-graphite/60 text-center">
+                © 2024 Gaurank
               </div>
             </div>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* CSS for slide-in animation */}
+      <style jsx>{`
+        @keyframes slideInRight {
+          from {
+            opacity: 0;
+            transform: translateX(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+      `}</style>
     </>
   );
 };
