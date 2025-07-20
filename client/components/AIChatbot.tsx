@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { ScrollArea } from "./ui/scroll-area";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
 import {
   MessageCircle,
   Send,
@@ -14,6 +14,8 @@ import {
   Paperclip,
 } from "lucide-react";
 import { JDUpload } from "./JDUpload";
+import { useTooltipPosition } from "./ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
 interface Message {
   id: string;
@@ -31,7 +33,7 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Hi! I'm Gaurank's AI assistant. Ask me anything about his background, projects, or experience! 🚀",
+      text: "Hi! I'm Gaurank's AI assistant. Ask me anything about his background, projects, or experience!",
       sender: "bot",
       timestamp: new Date(),
     },
@@ -164,9 +166,13 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
     }
   }, [messages, isTyping]);
 
+  const infoIconRef = useRef(null);
+  const infoTooltipRef = useRef(null);
+  const bestInfoSide = useTooltipPosition(infoIconRef, infoTooltipRef, 'top', 8);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-11/12 max-w-sm sm:w-80 md:w-96 h-auto max-h-[80vh] sm:h-[400px] md:h-[600px] p-0 gap-0 overflow-hidden">
+      <DialogContent className="w-[calc(100%-1rem)] max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl h-auto max-h-[80vh] p-0 gap-0 overflow-visible flex flex-col">
         <DialogHeader className="p-4 pb-2 border-b border-border/50">
           <DialogTitle className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
@@ -179,6 +185,9 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
               </div>
             </div>
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Chat interface for asking questions about Gaurank's background, projects, and experience
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 flex flex-col min-h-0">
@@ -300,6 +309,18 @@ export function AIChatbot({ isOpen, onClose }: AIChatbotProps) {
           </div>
         </div>
       </DialogContent>
+      <TooltipProvider delayDuration={100}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span ref={infoIconRef} className="cursor-help text-muted-foreground">
+              <Lightbulb className="w-4 h-4" />
+            </span>
+          </TooltipTrigger>
+          <TooltipContent ref={infoTooltipRef} side={bestInfoSide} className="max-w-xs text-center">
+            This assistant is grounded in Gaurank's resume, research, and project work and responds like a recruiter-facing AI with personality.
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </Dialog>
   );
 }

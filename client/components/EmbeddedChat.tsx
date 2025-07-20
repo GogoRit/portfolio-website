@@ -6,6 +6,7 @@ import { Send, Bot, User, Sparkles, Lightbulb, Paperclip } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { motion, useInView } from "framer-motion";
 import { JDUpload } from "./JDUpload";
+import { useTooltipPosition } from "./ui/tooltip";
 
 interface Message {
   id: string;
@@ -18,7 +19,7 @@ export function EmbeddedChat() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "👋 Hi! I'm Gaurank's AI assistant. Ask me anything about his background, projects, or experience!",
+      text: "Hi! I'm Gaurank's AI assistant. Ask me anything about his background, projects, or experience!",
       sender: "bot",
       timestamp: new Date(),
     },
@@ -153,6 +154,10 @@ export function EmbeddedChat() {
     }
   }, [messages, isTyping]);
 
+  const infoIconRef = useRef(null);
+  const infoTooltipRef = useRef(null);
+  const bestInfoSide = useTooltipPosition(infoIconRef, infoTooltipRef, 'top', 8);
+
   return (
     <motion.section
       id="ai"
@@ -177,11 +182,11 @@ export function EmbeddedChat() {
             <TooltipProvider delayDuration={100}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="cursor-help text-muted-foreground">
+                  <span ref={infoIconRef} className="cursor-help text-muted-foreground">
                     <Lightbulb className="w-4 h-4" />
                   </span>
                 </TooltipTrigger>
-                <TooltipContent className="max-w-xs text-center">
+                <TooltipContent ref={infoTooltipRef} side={bestInfoSide} className="max-w-xs text-center">
                   This assistant is grounded in Gaurank's resume, research, and project work and responds like a recruiter-facing AI with personality.
                 </TooltipContent>
               </Tooltip>

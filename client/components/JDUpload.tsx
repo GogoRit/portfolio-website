@@ -4,6 +4,7 @@ import { Textarea } from "./ui/textarea";
 import { Paperclip, X, FileText, Upload, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import { useTooltipPosition } from "./ui/tooltip";
 
 interface JDUploadProps {
   onJDChange: (jdContent: string | null, fileName?: string) => void;
@@ -31,6 +32,10 @@ export const JDUpload: React.FC<JDUploadProps> = ({
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
   const SMART_QUERY = "Based on the attached job description, how is Gaurank Maheshwari the ideal candidate for this role? Please highlight relevant skills, experiences, and adaptability.";
+
+  const attachBtnRef = useRef(null);
+  const tooltipContentRef = useRef(null);
+  const bestSide = useTooltipPosition(attachBtnRef, tooltipContentRef, 'top', 8);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -156,29 +161,20 @@ export const JDUpload: React.FC<JDUploadProps> = ({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
+                        ref={attachBtnRef}
                         type="button"
                         variant="outline"
                         size="sm"
                         onClick={handleAttachClick}
                         disabled={isUploading || (jdText.trim() && !selectedFile)}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 justify-center"
                       >
-                        {isUploading ? (
-                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <Paperclip className="w-4 h-4" />
-                        )}
-                        {isUploading ? "Uploading..." : "📎 Attach JD"}
+                        <Paperclip className="w-4 h-4" />
+                        Attach JD
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent className="max-w-xs text-center p-3">
-                      <div className="space-y-2">
-                        <p className="font-medium text-sm">Add your job description</p>
-                        <p className="text-xs text-muted-foreground">
-                          "Let me analyze how I can be the missing piece to your puzzle. 
-                          Like a well-crafted algorithm, I'll find the optimal fit!" 🧩✨
-                        </p>
-                      </div>
+                    <TooltipContent ref={tooltipContentRef} side={bestSide} className="max-w-[75vw] sm:max-w-xs whitespace-normal break-words z-50 text-center p-3">
+                      <span className="font-medium text-sm">Add your job description</span>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -266,29 +262,20 @@ export const JDUpload: React.FC<JDUploadProps> = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
+                ref={attachBtnRef}
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={handleAttachClick}
                 disabled={isUploading || (jdText.trim() && !selectedFile)}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 justify-center"
               >
-                {isUploading ? (
-                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Paperclip className="w-4 h-4" />
-                )}
-                {isUploading ? "Uploading..." : "📎 Attach JD"}
+                <Paperclip className="w-4 h-4" />
+                Attach JD
               </Button>
             </TooltipTrigger>
-            <TooltipContent className="max-w-xs text-center p-3">
-              <div className="space-y-2">
-                <p className="font-medium text-sm">Add your job description</p>
-                <p className="text-xs text-muted-foreground">
-                  "Let me analyze how I can be the missing piece to your puzzle. 
-                  Like a well-crafted algorithm, I'll find the optimal fit!" 🧩✨
-                </p>
-              </div>
+            <TooltipContent ref={tooltipContentRef} side={bestSide} className="max-w-[75vw] sm:max-w-xs whitespace-normal break-words z-50 text-center p-3">
+              <span className="font-medium text-sm">Add your job description</span>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

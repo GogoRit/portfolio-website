@@ -33,7 +33,12 @@ const AppContent = () => {
       
       {/* Main content - only render after intro completes */}
       {showMainPage && (
-        <BrowserRouter>
+        <BrowserRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true
+          }}
+        >
           <Navigation />
           <AIWidget />
           <MainPageReveal isVisible={showMainPage}>

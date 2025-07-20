@@ -348,7 +348,7 @@ const Navigation: React.FC = () => {
       </div>
 
       {/* CSS for slide-in animation */}
-      <style jsx>{`
+      <style>{`
         @keyframes slideInRight {
           from {
             opacity: 0;

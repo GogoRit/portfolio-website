@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
 import { AIChatbot } from "./AIChatbot";
 import { useAnimation } from "../contexts/AnimationContext";
+import { useTooltipPosition } from "./ui/tooltip";
+import ReactDOM from "react-dom";
+import { createPortal } from "react-dom";
 
 // Bitmoji avatar path
 const BITMOJI_AVATAR = "/icons/bitmoji.png";
@@ -19,6 +22,7 @@ export const AIWidget: React.FC = () => {
   const tooltipTimerRef = useRef<NodeJS.Timeout | null>(null);
   const controls = useAnimationControls();
   const widgetRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
   // Define margin constant for consistent edge padding
   const MARGIN = 16;
@@ -264,6 +268,9 @@ export const AIWidget: React.FC = () => {
     </div>
   );
 
+  // Use the shared hook to determine the best side for the tooltip
+  const bestTooltipSide = useTooltipPosition(widgetRef, tooltipRef, tooltipPosition, 8);
+
   // Don't render until we're on the client side
   if (!isClient) {
     return null;
@@ -397,41 +404,34 @@ export const AIWidget: React.FC = () => {
           
           {/* Dynamic hover tooltip with edge-aware positioning */}
           <AnimatePresence>
-            {showTooltip && !showWelcomeCloud && !isDragging && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-                className={`absolute px-4 py-3 bg-appleGlass/95 backdrop-blur-apple rounded-apple-lg border border-white/30 shadow-apple-lg text-sm font-medium text-graphite max-w-xs whitespace-nowrap ${
-                  tooltipPosition === 'left' ? 'right-full mr-3 top-1/2 -translate-y-1/2' :
-                  tooltipPosition === 'right' ? 'left-full ml-3 top-1/2 -translate-y-1/2' :
-                  tooltipPosition === 'top' ? 'bottom-full mb-3 left-1/2 -translate-x-1/2' :
-                  tooltipPosition === 'top-left' ? 'bottom-full mb-3 right-0' :
-                  'top-full mt-3 left-1/2 -translate-x-1/2'
-                }`}
-                style={{
-                  minWidth: '200px',
-                  maxWidth: '280px'
-                }}
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-                  <span className="text-graphite font-medium">Gaurank AI</span>
-                </div>
-                <div className="text-graphite/80 text-xs mt-1">
-                  Ask me anything!
-                </div>
-                {/* Dynamic tooltip arrow */}
-                <div className={`absolute w-0 h-0 border-4 border-transparent ${
-                  tooltipPosition === 'left' ? 'left-full border-l-appleGlass/95 -right-1 top-1/2 -translate-y-1/2' :
-                  tooltipPosition === 'right' ? 'right-full border-r-appleGlass/95 -left-1 top-1/2 -translate-y-1/2' :
-                  tooltipPosition === 'top' ? 'top-full border-t-appleGlass/95 -bottom-1 left-1/2 -translate-x-1/2' :
-                  tooltipPosition === 'top-left' ? 'top-full border-t-appleGlass/95 -bottom-1 right-4' :
-                  'bottom-full border-b-appleGlass/95 -top-1 left-1/2 -translate-x-1/2'
-                }`} />
-              </motion.div>
-            )}
+            {showTooltip && !showWelcomeCloud && !isDragging && tooltipRef.current && widgetRef.current &&
+              createPortal(
+                <motion.div
+                  ref={tooltipRef}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  style={{
+                    position: 'fixed',
+                    zIndex: 9999,
+                    left: bestTooltipSide.x,
+                    top: bestTooltipSide.y,
+                  }}
+                  className="px-4 py-3 bg-appleGlass/95 backdrop-blur-apple rounded-apple-lg border border-white/30 shadow-apple-lg text-sm font-medium text-graphite max-w-xs whitespace-nowrap"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                    <span className="text-graphite font-medium">Gaurank AI</span>
+                  </div>
+                  <div className="text-graphite/80 text-xs mt-1">
+                    Ask me anything!
+                  </div>
+                  {/* Dynamic tooltip arrow (optional, can be improved for portal) */}
+                </motion.div>,
+                document.body
+              )
+            }
           </AnimatePresence>
         </motion.button>
       </motion.div>
@@ -444,26 +444,12 @@ export const AIWidget: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="fixed z-50 inset-4 sm:inset-8 md:inset-12"
-            style={{
-              // Mobile: full-width bottom drawer
-              // Desktop: positioned relative to widget
-              ...(window.innerWidth < 640 ? {
-                inset: '0.5rem',
-                width: 'calc(100% - 1rem)',
-                height: 'calc(100% - 1rem)',
-                maxHeight: '70vh'
-              } : {
-                bottom: '6rem',
-                right: '1.5rem',
-                width: '11/12',
-                maxWidth: '24rem',
-                height: 'auto',
-                maxHeight: '80vh'
-              })
-            }}
+            className="fixed z-50 flex justify-center items-end sm:items-center inset-0 pointer-events-auto"
+            style={{ background: 'none' }} // Remove any overlay background
           >
-            <div className="w-full h-full backdrop-blur-apple bg-appleGlass/90 rounded-apple-lg border border-white/20 shadow-apple-lg overflow-hidden">
+            <div
+              className="w-[calc(100%-1rem)] max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto h-auto max-h-[80vh] bg-appleGlass/90 backdrop-blur-apple rounded-apple-lg border border-white/20 shadow-apple-lg overflow-hidden flex flex-col"
+            >
               <AIChatbot isOpen={showChat} onClose={handleCloseChat} />
             </div>
           </motion.div>
