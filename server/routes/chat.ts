@@ -7,15 +7,26 @@ import { parseJobDescription, validatePDFBuffer } from "../services/pdfParser.js
 import { fileURLToPath } from "url";
 import logger from "../logger";
 
-// ES Module compatible __dirname equivalent
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 // Load the profile JSON once at startup with error handling
 let profile: any;
 try {
-  const profilePath = path.resolve(__dirname, "../../data/gaurank.json");
-  profile = JSON.parse(fs.readFileSync(profilePath, "utf-8"));
+  // Try to load from file first
+  let profilePath: string;
+  if (typeof import.meta !== 'undefined' && import.meta.url) {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    profilePath = path.resolve(__dirname, "../../data/gaurank.json");
+  } else {
+    // Fallback for serverless environment
+    profilePath = path.resolve(process.cwd(), "data/gaurank.json");
+  }
+  
+  // Check if file exists before trying to read it
+  if (fs.existsSync(profilePath)) {
+    profile = JSON.parse(fs.readFileSync(profilePath, "utf-8"));
+  } else {
+    throw new Error("Profile file not found");
+  }
 } catch (error) {
   logger.error("Failed to load profile data:", error);
   // Fallback profile data in case file loading fails (embedded for serverless)
