@@ -14,6 +14,7 @@ export const AIWidget: React.FC = () => {
   const [showTooltip, setShowTooltip] = useState(false);
   const [showWelcomeCloud, setShowWelcomeCloud] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [isWidgetVisible, setIsWidgetVisible] = useState(false);
   const [widgetDimensions, setWidgetDimensions] = useState({ width: 80, height: 80 });
   const [isDragging, setIsDragging] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState<'left' | 'right' | 'top' | 'bottom'>('left');
@@ -33,6 +34,22 @@ export const AIWidget: React.FC = () => {
     setIsClient(true);
   }, []);
 
+  // Coordinate timing with main content reveal
+  useEffect(() => {
+    if (showMainPage && isClient) {
+      // Delay widget appearance by 200ms to let main content render first
+      const widgetTimer = setTimeout(() => {
+        setIsWidgetVisible(true);
+      }, 200);
+
+      return () => {
+        if (widgetTimer) {
+          clearTimeout(widgetTimer);
+        }
+      };
+    }
+  }, [showMainPage, isClient]);
+
   // Calculate widget dimensions and set initial position to bottom-right
   useEffect(() => {
     if (isClient && widgetRef.current) {
@@ -41,8 +58,10 @@ export const AIWidget: React.FC = () => {
       
       // Always initialize at bottom-right corner with proper margins
       // Account for navbar height at the top
-      const initialX = window.innerWidth - rect.width - MARGIN;
-      const initialY = window.innerHeight - rect.height - MARGIN;
+      const widgetWidth = rect.width;
+      const widgetHeight = rect.height;
+      const initialX = window.innerWidth - widgetWidth - MARGIN;
+      const initialY = window.innerHeight - widgetHeight - MARGIN;
       
       console.log('AIWidget: Setting initial position:', { initialX, initialY, windowWidth: window.innerWidth, windowHeight: window.innerHeight });
       
@@ -60,6 +79,14 @@ export const AIWidget: React.FC = () => {
       if (widgetRef.current) {
         const rect = widgetRef.current.getBoundingClientRect();
         setWidgetDimensions({ width: rect.width, height: rect.height });
+        
+        // Update position on resize to maintain corner positioning
+        const widgetWidth = rect.width;
+        const widgetHeight = rect.height;
+        const newX = window.innerWidth - widgetWidth - MARGIN;
+        const newY = window.innerHeight - widgetHeight - MARGIN;
+        
+        controls.set({ x: newX, y: newY });
       }
     };
 
@@ -70,7 +97,7 @@ export const AIWidget: React.FC = () => {
         clearTimeout(tooltipTimerRef.current);
       }
     };
-  }, []);
+  }, [controls, MARGIN]);
 
   // Persistent welcome cloud logic - shows after intro and stays until clicked
   useEffect(() => {
@@ -80,7 +107,7 @@ export const AIWidget: React.FC = () => {
     const hasSeenWelcome = sessionStorage.getItem('ai-widget-welcome-seen');
     console.log('AIWidget: hasSeenWelcome:', hasSeenWelcome);
     
-    if (!hasSeenWelcome) {
+    if (!hasSeenWelcome && isWidgetVisible) {
       console.log('AIWidget: Setting up welcome cloud timer');
       
       // Show welcome cloud after a short delay (since we're already after intro)
@@ -99,7 +126,7 @@ export const AIWidget: React.FC = () => {
         timerRef.current = null;
       }
     };
-  }, []); // Only run once when component mounts
+  }, [isWidgetVisible]); // Only run when widget becomes visible
 
   // Handle chat click - hide welcome cloud when user opens chat
   const handleChatClick = () => {
@@ -271,36 +298,53 @@ export const AIWidget: React.FC = () => {
   // Use the shared hook to determine the best side for the tooltip
   const bestTooltipSide = useTooltipPosition(widgetRef, tooltipRef, tooltipPosition, 8);
 
-  // Don't render until we're on the client side
-  if (!isClient) {
+  // Don't render until we're on the client side and widget should be visible
+  if (!isClient || !isWidgetVisible) {
     return null;
   }
 
-  const calculatedX = window.innerWidth - 80 - MARGIN;
-  const calculatedY = window.innerHeight - 80 - MARGIN;
-  console.log('AIWidget: Rendering widget, isClient:', isClient, 'showMainPage:', showMainPage, 'widgetDimensions:', widgetDimensions);
+  // Calculate responsive position for both web and mobile
+  const widgetWidth = 80; // Base widget width
+  const widgetHeight = 80; // Base widget height
+  const calculatedX = window.innerWidth - widgetWidth - MARGIN;
+  const calculatedY = window.innerHeight - widgetHeight - MARGIN;
+  console.log('AIWidget: Rendering widget, isClient:', isClient, 'showMainPage:', showMainPage, 'isWidgetVisible:', isWidgetVisible, 'widgetDimensions:', widgetDimensions);
   console.log('AIWidget: Calculated position:', { calculatedX, calculatedY, windowWidth: window.innerWidth, windowHeight: window.innerHeight });
 
   return (
     <>
-
-
-            {/* Draggable Chat Widget - Bottom Right */}
+      {/* Draggable Chat Widget - Bottom Right */}
       <motion.div
         ref={widgetRef}
-        initial={{ opacity: 0, scale: 0.8 }}
+        initial={{ 
+          opacity: 0, 
+          scale: 0.8,
+          x: calculatedX,
+          y: calculatedY
+        }}
         animate={{ 
           opacity: 1, 
           scale: 1,
-          x: window.innerWidth - 80 - MARGIN,
-          y: window.innerHeight - 80 - MARGIN
+          x: calculatedX,
+          y: calculatedY
+        }}
+        transition={{
+          opacity: { duration: 0.3, ease: "easeOut" },
+          scale: { 
+            type: "spring", 
+            stiffness: 500, 
+            damping: 20, 
+            duration: 0.8 
+          },
+          x: { duration: 0 }, // No movement, just scale
+          y: { duration: 0 }  // No movement, just scale
         }}
         drag
         dragConstraints={{ 
           top: NAVBAR_HEIGHT + MARGIN, // Start below navbar
           left: MARGIN,
-          right: window.innerWidth - 80 - MARGIN,
-          bottom: window.innerHeight - 80 - MARGIN
+          right: window.innerWidth - widgetWidth - MARGIN,
+          bottom: window.innerHeight - widgetHeight - MARGIN
         }}
         dragElastic={0.2}
         onDragStart={() => setIsDragging(true)}
@@ -319,16 +363,14 @@ export const AIWidget: React.FC = () => {
           touchAction: 'none'
         }}
       >
-
-          
-          <motion.button
-            className="w-full h-full group"
-            onClick={handleChatClick}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
+        <motion.button
+          className="w-full h-full group"
+          onClick={handleChatClick}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
           {/* Apple-style notification ring */}
           <motion.div
             className="absolute inset-0 rounded-full bg-blue-500/30 border-2 border-blue-500/60"

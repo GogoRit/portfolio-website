@@ -24,14 +24,18 @@ const sectionVariants = {
 
 // Container variants for overall reveal
 const containerVariants = {
-  hidden: { opacity: 0 },
+  hidden: { 
+    opacity: 0,
+    y: 10 // Slight upward movement for smoother entrance
+  },
   visible: {
     opacity: 1,
+    y: 0,
     transition: {
-      duration: 0.6,
+      duration: 0.8, // Increased from 0.6 for smoother fade
       ease: "easeOut",
       staggerChildren: 0.1, // Reduced from 0.15 to 0.1 for faster reveal
-      delayChildren: 0.3 // Increased from 0.1 to 0.3 to ensure no overlap with intro fade
+      delayChildren: 0.3 // Increased from 0.2 to 0.3 to ensure proper fade-in timing
     }
   }
 };
@@ -61,8 +65,9 @@ export const MainPageReveal: React.FC<MainPageRevealProps> = ({ children, isVisi
   }
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       <motion.div
+        key={isVisible ? "visible" : "hidden"}
         variants={containerVariants}
         initial="hidden"
         animate="visible"

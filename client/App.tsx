@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./global.css";
 
 import { Toaster } from "@/components/ui/toaster";
@@ -19,9 +19,16 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const { showMainPage, setShowMainPage } = useAnimation();
+  const [introFading, setIntroFading] = useState(false);
 
   const handleIntroComplete = () => {
-    setShowMainPage(true);
+    // Start the intro fade out
+    setIntroFading(true);
+    
+    // Wait for the intro fade to complete before showing main page
+    setTimeout(() => {
+      setShowMainPage(true);
+    }, 1000); // 1 second delay to match the intro fade duration
   };
 
   return (
@@ -31,7 +38,7 @@ const AppContent = () => {
         <AppleIntroAnimation onComplete={handleIntroComplete} />
       )}
       
-      {/* Main content - only render after intro completes */}
+      {/* Main content - only render after intro fade completes */}
       {showMainPage && (
         <BrowserRouter
           future={{

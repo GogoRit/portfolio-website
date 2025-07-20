@@ -92,10 +92,10 @@ export const AppleIntroAnimation: React.FC<AppleIntroAnimationProps> = ({ onComp
       setCurrentPhase("complete");
     }, greetingTypewriterTime + 6000 + movieTypewriterTime)); // Greeting + intro texts + movie typewriter duration
 
-    // Complete the animation and call onComplete after fade out is complete
+    // Complete the animation and call onComplete immediately when complete phase starts
     timers.push(setTimeout(() => {
       onComplete();
-    }, greetingTypewriterTime + 6000 + movieTypewriterTime + 1000)); // Greeting + intro texts + movie typewriter + fade out duration
+    }, greetingTypewriterTime + 6000 + movieTypewriterTime)); // Greeting + intro texts + movie typewriter duration
 
     return () => {
       timers.forEach(timer => clearTimeout(timer));
@@ -320,7 +320,7 @@ export const AppleIntroAnimation: React.FC<AppleIntroAnimationProps> = ({ onComp
                 className="max-w-4xl px-8 backdrop-blur-sm"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+                // Removed the exit animation to prevent double fade
                 transition={{ 
                   duration: 0.6,
                   ease: "easeOut"
@@ -349,15 +349,7 @@ export const AppleIntroAnimation: React.FC<AppleIntroAnimationProps> = ({ onComp
           </AnimatePresence>
         </div>
 
-        {/* Fade out overlay - only when completing */}
-        {currentPhase === "complete" && (
-          <motion.div
-            className="absolute inset-0 bg-silver/95 backdrop-blur-sm"
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 0 }}
-            transition={{ duration: 1.0, ease: "easeInOut" }}
-          />
-        )}
+        {/* Removed the complete phase overlay to prevent double fade */}
       </motion.div>
     </AnimatePresence>
   );
