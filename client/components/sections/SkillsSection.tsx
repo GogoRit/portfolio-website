@@ -42,7 +42,7 @@ const SkillsSection: React.FC = () => {
     "💻 Languages"
   );
   return (
-    <section id="skills" className="pt-16 lg:pt-20 pb-12">
+    <section id="skills" className="pt-20 lg:pt-24 pb-12">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl lg:text-4xl font-bold text-center mb-12">

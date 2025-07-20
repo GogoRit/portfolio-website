@@ -151,8 +151,15 @@ const Navigation: React.FC = () => {
   // Handle nav link clicks
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
+    
+    // Immediately set the active section to prevent confusion
     setActiveSection(href);
-    smoothScrollToSection(href);
+    
+    // Add a small delay to ensure the state update is processed
+    setTimeout(() => {
+      smoothScrollToSection(href);
+    }, 10);
+    
     // Close mobile menu after clicking a link
     setIsMobileMenuOpen(false);
   };
@@ -170,21 +177,56 @@ const Navigation: React.FC = () => {
 
     if (sectionElements.length === 0) return;
 
-    const observer = new IntersectionObserver(
+    // Create separate observers for different section types
+    const createObserver = (threshold: number) => new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(`#${entry.target.id}`);
-          }
+        // Sort entries by their position in the document to ensure proper order
+        const sortedEntries = entries.sort((a, b) => {
+          const aRect = a.boundingClientRect;
+          const bRect = b.boundingClientRect;
+          return aRect.top - bRect.top;
         });
+
+        // Find the most appropriate active section
+        let newActiveSection = activeSection;
+        
+        for (const entry of sortedEntries) {
+          if (entry.isIntersecting) {
+            // Only update if this section is more prominent in the viewport
+            const intersectionRatio = entry.intersectionRatio;
+            if (intersectionRatio >= threshold) {
+              newActiveSection = `#${entry.target.id}`;
+              break; // Use the first (topmost) intersecting section
+            }
+          }
+        }
+        
+        if (newActiveSection !== activeSection) {
+          setActiveSection(newActiveSection);
+        }
       },
       { 
-        threshold: 0.3, 
-        rootMargin: `-${headerHeight + 24}px 0px 0px 0px` 
+        threshold, 
+        rootMargin: `-${headerHeight + 32}px 0px 0px 0px` 
       }
     );
 
-    sectionElements.forEach((el) => observer.observe(el));
+    // Use different thresholds for different sections
+    const longSectionObserver = createObserver(0.4); // For longer sections - higher threshold
+    const shortSectionObserver = createObserver(0.2); // For medium sections like Research and Now
+    const ultraShortSectionObserver = createObserver(0.15); // For very short sections like Skills and Contact
+
+    sectionElements.forEach((el) => {
+      const sectionId = el.id;
+      // Use different thresholds based on section content length
+      if (sectionId === 'skills' || sectionId === 'contact') {
+        ultraShortSectionObserver.observe(el);
+      } else if (sectionId === 'research' || sectionId === 'now') {
+        shortSectionObserver.observe(el);
+      } else {
+        longSectionObserver.observe(el);
+      }
+    });
 
     // Special handling for Contact section at bottom
     const handleScrollBottom = () => {
@@ -196,7 +238,9 @@ const Navigation: React.FC = () => {
     window.addEventListener("scroll", handleScrollBottom);
 
     return () => {
-      observer.disconnect();
+      longSectionObserver.disconnect();
+      shortSectionObserver.disconnect();
+      ultraShortSectionObserver.disconnect();
       window.removeEventListener("scroll", handleScrollBottom);
     };
   }, [headerHeight]);

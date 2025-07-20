@@ -5,7 +5,7 @@ import { EmbeddedChat } from "../EmbeddedChat";
 import { MapPin, GraduationCap, Building } from "lucide-react";
 
 const HeroSection: React.FC = () => (
-  <section id="hero" className="pt-20 lg:pt-24 pb-12 relative overflow-hidden min-h-screen">
+  <section id="hero" className="pt-24 lg:pt-32 pb-12 relative overflow-hidden min-h-screen">
     {/* Apple-style background with subtle gradients */}
     <div className="absolute inset-0 bg-gradient-to-br from-silver/30 via-white to-blue/5"></div>
     

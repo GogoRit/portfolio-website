@@ -76,7 +76,7 @@
 
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 80px; /* Account for fixed header */
+    scroll-padding-top: 100px; /* Account for fixed header with increased padding */
   }
 
   body {
