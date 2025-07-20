@@ -20,7 +20,7 @@ export async function parseJobDescription(buffer: any): Promise<string> {
         .trim();
       
       if (readableText.length > 0) {
-        console.log(`PDF parsed successfully: ${readableText.length} characters (fallback method)`);
+        // PDF parsed successfully using fallback method
         return readableText;
       }
       
@@ -39,11 +39,11 @@ export async function parseJobDescription(buffer: any): Promise<string> {
       throw new Error('No text content found in PDF');
     }
     
-    console.log(`PDF parsed successfully: ${extractedText.length} characters`);
+          // PDF parsed successfully
     
     return extractedText;
   } catch (error) {
-    console.error('PDF parsing error:', error);
+    // PDF parsing error occurred
     throw new Error(`Failed to parse PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }

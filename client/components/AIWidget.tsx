@@ -63,12 +63,9 @@ export const AIWidget: React.FC = () => {
       const initialX = window.innerWidth - widgetWidth - MARGIN;
       const initialY = window.innerHeight - widgetHeight - MARGIN;
       
-      console.log('AIWidget: Setting initial position:', { initialX, initialY, windowWidth: window.innerWidth, windowHeight: window.innerHeight });
-      
       // Add a small delay to ensure the widget is rendered before setting position
       setTimeout(() => {
         controls.set({ x: initialX, y: initialY });
-        console.log('AIWidget: Controls set to:', { x: initialX, y: initialY });
       }, 100);
     }
   }, [isClient, controls, MARGIN]);
@@ -101,22 +98,14 @@ export const AIWidget: React.FC = () => {
 
   // Persistent welcome cloud logic - shows after intro and stays until clicked
   useEffect(() => {
-    console.log('AIWidget: Component mounted, showMainPage:', showMainPage);
-    
     // Since AIWidget only mounts after intro completes, we can show cloud immediately
     const hasSeenWelcome = sessionStorage.getItem('ai-widget-welcome-seen');
-    console.log('AIWidget: hasSeenWelcome:', hasSeenWelcome);
     
     if (!hasSeenWelcome && isWidgetVisible) {
-      console.log('AIWidget: Setting up welcome cloud timer');
-      
       // Show welcome cloud after a short delay (since we're already after intro)
       timerRef.current = setTimeout(() => {
-        console.log('AIWidget: Showing welcome cloud');
         setShowWelcomeCloud(true);
       }, 1000); // 1 second delay after widget appears
-    } else {
-      console.log('AIWidget: Welcome cloud already seen, not showing');
     }
 
     // Cleanup function to clear timers on unmount
@@ -135,7 +124,6 @@ export const AIWidget: React.FC = () => {
     if (showWelcomeCloud) {
       setShowWelcomeCloud(false);
       sessionStorage.setItem('ai-widget-welcome-seen', 'true');
-      console.log('AIWidget: Welcome cloud dismissed by user click');
     }
   };
 
@@ -276,12 +264,11 @@ export const AIWidget: React.FC = () => {
             alt="AI Assistant Avatar"
             className="w-full h-full object-cover object-center"
             onError={(e) => {
-              console.log('AIWidget: Bitmoji image failed to load, using fallback');
               const target = e.target as HTMLImageElement;
               target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23007aff'/%3E%3Cpath d='M30 40c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10-10-4.5-10-10zm20 0c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10-10-4.5-10-10z' fill='white'/%3E%3C/svg%3E";
             }}
             onLoad={() => {
-              console.log('AIWidget: Bitmoji image loaded successfully');
+              // Image loaded successfully
             }}
           />
         </div>
@@ -308,8 +295,6 @@ export const AIWidget: React.FC = () => {
   const widgetHeight = 80; // Base widget height
   const calculatedX = window.innerWidth - widgetWidth - MARGIN;
   const calculatedY = window.innerHeight - widgetHeight - MARGIN;
-  console.log('AIWidget: Rendering widget, isClient:', isClient, 'showMainPage:', showMainPage, 'isWidgetVisible:', isWidgetVisible, 'widgetDimensions:', widgetDimensions);
-  console.log('AIWidget: Calculated position:', { calculatedX, calculatedY, windowWidth: window.innerWidth, windowHeight: window.innerHeight });
 
   return (
     <>
