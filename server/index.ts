@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { chatRouter } from "./routes/chat";
+import logger from "./logger";
 
 export function createServer() {
   const app = express();
@@ -13,6 +14,7 @@ export function createServer() {
 
   // Example API routes
   app.get("/api/ping", (_req, res) => {
+    logger.info("Ping endpoint called");
     res.json({ message: "Hello from Express server v2!" });
   });
 

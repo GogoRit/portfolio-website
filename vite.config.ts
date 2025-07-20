@@ -11,6 +11,20 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     outDir: "dist/spa",
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-tooltip', '@radix-ui/react-accordion'],
+          animations: ['framer-motion'],
+          icons: ['lucide-react'],
+          forms: ['react-hook-form', '@hookform/resolvers'],
+          charts: ['recharts'],
+          three: ['three']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000, // Increase warning limit for larger chunks
   },
   plugins: [react(), expressPlugin()],
   resolve: {

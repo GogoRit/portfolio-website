@@ -4,6 +4,12 @@ import path from "path";
 import fs from "fs";
 import multer from "multer";
 import { parseJobDescription, validatePDFBuffer } from "../services/pdfParser.js";
+import { fileURLToPath } from "url";
+import logger from "../logger";
+
+// ES Module compatible __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load the profile JSON once at startup
 const profilePath = path.resolve(__dirname, "../../data/gaurank.json");
@@ -65,27 +71,28 @@ Profile JSON:\n${JSON.stringify(profile, null, 2)}\n`;
   
   if (pdfFile) {
     try {
-      console.log(`Processing uploaded PDF: ${pdfFile.originalname}, size: ${pdfFile.size} bytes`);
+      logger.info(`Processing uploaded PDF: ${pdfFile.originalname}, size: ${pdfFile.size} bytes`);
       
       // Validate the PDF buffer
       if (!validatePDFBuffer(pdfFile.buffer)) {
+        logger.warn(`Invalid PDF file format: ${pdfFile.originalname}`);
         return res.status(400).json({ error: "Invalid PDF file format" });
       }
       
       // Parse the PDF to extract text
       jdContent = await parseJobDescription(pdfFile.buffer);
       
-      console.log(`JD text extracted from PDF (${jdContent.length} characters)`);
+      logger.info(`JD text extracted from PDF (${jdContent.length} characters)`);
     } catch (error) {
-      console.error('PDF processing error:', error);
+      logger.error('PDF processing error:', error);
       return res.status(400).json({ 
         error: `Failed to process PDF: ${error instanceof Error ? error.message : 'Unknown error'}` 
       });
     }
-  } else if (jdText && jdText.trim()) {
+      } else if (jdText && jdText.trim()) {
     // Use provided text input
     jdContent = jdText.trim();
-    console.log(`Using provided JD text (${jdContent.length} characters)`);
+    logger.info(`Using provided JD text (${jdContent.length} characters)`);
   }
 
   // Add JD content to system prompt if available
@@ -103,9 +110,10 @@ Profile JSON:\n${JSON.stringify(profile, null, 2)}\n`;
     });
 
     const answer = completion.choices[0].message?.content?.trim() ?? "I'm sorry, something went wrong.";
+    logger.info(`Chat response generated successfully`);
     res.json({ answer });
   } catch (error: any) {
-    console.error("/api/chat error", error);
+    logger.error("/api/chat error", error);
     res.status(500).json({ error: "Failed to generate response" });
   }
 }); 
