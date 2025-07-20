@@ -21,7 +21,7 @@ Go to your Netlify site dashboard:
 Your `netlify.toml` should look like this:
 ```toml
 [build]
-  command = "npm install && npm run build:client"
+  command = "npm install --production=false && npm run build:client"
   functions = "netlify/functions"
   publish = "dist/spa"
 
