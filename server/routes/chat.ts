@@ -1,36 +1,15 @@
 import { Router } from "express";
 import OpenAI from "openai";
-import path from "path";
-import fs from "fs";
 import multer from "multer";
 import { parseJobDescription, validatePDFBuffer } from "../services/pdfParser.js";
-import { fileURLToPath } from "url";
 import logger from "../logger";
 
 // Load the profile JSON once at startup with error handling
 let profile: any;
-try {
-  // Try to load from file first
-  let profilePath: string;
-  if (typeof import.meta !== 'undefined' && import.meta.url) {
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    profilePath = path.resolve(__dirname, "../../data/gaurank.json");
-  } else {
-    // Fallback for serverless environment
-    profilePath = path.resolve(process.cwd(), "data/gaurank.json");
-  }
-  
-  // Check if file exists before trying to read it
-  if (fs.existsSync(profilePath)) {
-    profile = JSON.parse(fs.readFileSync(profilePath, "utf-8"));
-  } else {
-    throw new Error("Profile file not found");
-  }
-} catch (error) {
-  logger.error("Failed to load profile data:", error);
-  // Fallback profile data in case file loading fails (embedded for serverless)
-  profile = {
+
+// For serverless environments, use embedded profile data
+// This avoids file path resolution issues
+profile = {
     "name": "Gaurank Maheshwari",
     "title": "AI Developer | Researcher | Data Scientist",
     "origin": {
@@ -86,7 +65,6 @@ try {
       "frameworks": ["LangChain", "LangFlow", "Crew AI", "Swarm", "Autogen", "PyTorch", "FastAPI", "React", "Tailwind CSS"]
     }
   };
-}
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
