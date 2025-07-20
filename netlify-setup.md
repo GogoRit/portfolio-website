@@ -21,7 +21,7 @@ Go to your Netlify site dashboard:
 Your `netlify.toml` should look like this:
 ```toml
 [build]
-  command = "npm run build:client"
+  command = "npm install && npm run build:client"
   functions = "netlify/functions"
   publish = "dist/spa"
 
@@ -32,11 +32,6 @@ Your `netlify.toml` should look like this:
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api"
-  status = 200
-
-[[redirects]]
-  from = "/test"
-  to = "/.netlify/functions/test"
   status = 200
 ```
 
@@ -52,7 +47,6 @@ git push origin main
 ### 4. Test the Deployment
 
 Once deployed, test these endpoints:
-- `https://your-site.netlify.app/test` - Should return "Serverless function is working!"
 - `https://your-site.netlify.app/api/ping` - Should return "Hello from Express server v2!"
 
 ### 5. Test Chat API
