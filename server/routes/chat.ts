@@ -11,9 +11,71 @@ import logger from "../logger";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load the profile JSON once at startup
-const profilePath = path.resolve(__dirname, "../../data/gaurank.json");
-const profile = JSON.parse(fs.readFileSync(profilePath, "utf-8"));
+// Load the profile JSON once at startup with error handling
+let profile: any;
+try {
+  const profilePath = path.resolve(__dirname, "../../data/gaurank.json");
+  profile = JSON.parse(fs.readFileSync(profilePath, "utf-8"));
+} catch (error) {
+  logger.error("Failed to load profile data:", error);
+  // Fallback profile data in case file loading fails (embedded for serverless)
+  profile = {
+    "name": "Gaurank Maheshwari",
+    "title": "AI Developer | Researcher | Data Scientist",
+    "origin": {
+      "hometown": "Kishangarh, Rajasthan, India",
+      "current_location": "Rochester, NY, USA"
+    },
+    "contact": {
+      "email": "gm8189@g.rit.edu",
+      "phone": "+1 (585) 957-6312",
+      "github": "https://github.com/GogoRit",
+      "linkedin": "https://www.linkedin.com/in/gaurank",
+      "location": "Rochester, NY, USA"
+    },
+    "education": [
+      {
+        "institution": "Rochester Institute of Technology (RIT)",
+        "degree": "M.S. in Data Science",
+        "gpa": "4.0 / 4.0",
+        "graduation_date": "Dec 2025 (expected)",
+        "courses": [
+          "Neural Networks",
+          "Human Factors in AI",
+          "Applied Statistics",
+          "Software Engineering for Data Science"
+        ]
+      },
+      {
+        "institution": "LNMIIT, Jaipur",
+        "degree": "B.Tech. in Computer Science",
+        "graduation_date": "May 2023"
+      }
+    ],
+    "current_role": {
+      "title": "AI Developer",
+      "company": "MAGIC Spell Studios",
+      "start": "Jan 2025",
+      "summary": "Leading development of aiPaperboyz – an AI-powered podcast-summarization and transcript-delivery platform."
+    },
+    "projects": [
+      {
+        "name": "aiPaperboyz",
+        "description": "An AI-powered podcast-summarization platform with speaker diarization and transcript enrichment using LLM agents.",
+        "tech": ["OpenAI", "Deepgram", "FastAPI", "Docker", "PostgreSQL", "Firebase", "Tailwind CSS", "React", "TypeScript"]
+      },
+      {
+        "name": "NewsLens AI",
+        "description": "Capstone project that reduced hallucinations in AI-generated news summaries by more than 90% using Gemini, GPT-3.5, and Hugging Face NER.",
+        "tech": ["Gemini", "GPT-3.5", "NER", "Hugging Face", "TensorFlow", "Python"]
+      }
+    ],
+    "skills": {
+      "languages": ["Python", "TypeScript", "Java", "SQL", "HTML", "LaTeX"],
+      "frameworks": ["LangChain", "LangFlow", "Crew AI", "Swarm", "Autogen", "PyTorch", "FastAPI", "React", "Tailwind CSS"]
+    }
+  };
+}
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,

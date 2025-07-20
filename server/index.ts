@@ -4,7 +4,7 @@ import { handleDemo } from "./routes/demo";
 import { chatRouter } from "./routes/chat";
 import logger from "./logger";
 
-export function createServer() {
+export function createServer(options: { serverless?: boolean } = {}) {
   const app = express();
 
   // Middleware
@@ -20,6 +20,14 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
   app.use("/api/chat", chatRouter);
+
+  // Only add static file serving and SPA routing for full server mode
+  if (!options.serverless) {
+    // Static file serving and SPA routing will be added in node-build.ts
+    logger.info("Server created in full mode (with static file serving)");
+  } else {
+    logger.info("Server created in serverless mode (API routes only)");
+  }
 
   return app;
 }

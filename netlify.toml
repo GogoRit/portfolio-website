@@ -3,13 +3,11 @@
   functions = "netlify/functions"
   publish = "dist/spa"
 
-
 [functions]
-  external_node_modules = ["express"]
+  external_node_modules = ["express", "openai", "multer", "cors"]
   node_bundler = "esbuild"
   
 [[redirects]]
-  force = true
   from = "/api/*"
+  to = "/.netlify/functions/api"
   status = 200
-  to = "/.netlify/functions/api/:splat"
