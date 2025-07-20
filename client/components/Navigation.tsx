@@ -46,8 +46,9 @@ const AppleIcons = {
 
 const navItems = [
   { label: "Home", href: "#hero", icon: AppleIcons.home },
-  { label: "Projects", href: "#projects", icon: AppleIcons.projects },
   { label: "Timeline", href: "#timeline", icon: AppleIcons.timeline },
+  { label: "Research", href: "#research", icon: AppleIcons.projects },
+  { label: "Projects", href: "#projects", icon: AppleIcons.projects },
   { label: "Now", href: "#now", icon: AppleIcons.now },
   { label: "Skills", href: "#skills", icon: AppleIcons.skills },
   { label: "Contact", href: "#contact", icon: AppleIcons.contact },
@@ -139,13 +140,10 @@ const Navigation: React.FC = () => {
   const smoothScrollToSection = (sectionId: string) => {
     const element = document.querySelector(sectionId);
     if (element) {
-      const elementTop = element.getBoundingClientRect().top + window.scrollY;
-      // Add extra margin (16px) for better spacing from the header
-      const offsetPosition = elementTop - headerHeight - 16;
-      
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
+      // Use native scrollIntoView with smooth behavior and offset
+      element.scrollIntoView({ 
+        behavior: "smooth",
+        block: "start"
       });
     }
   };
@@ -182,7 +180,7 @@ const Navigation: React.FC = () => {
       },
       { 
         threshold: 0.3, 
-        rootMargin: `-${headerHeight + 16}px 0px 0px 0px` 
+        rootMargin: `-${headerHeight + 24}px 0px 0px 0px` 
       }
     );
 
@@ -220,10 +218,7 @@ const Navigation: React.FC = () => {
             className="flex items-center gap-3 text-xl font-medium"
             onClick={(e) => handleNavClick(e, "#hero")}
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-blue to-purple rounded-xl flex items-center justify-center shadow-apple-sm">
-              <span className="text-white text-sm font-semibold">G</span>
-            </div>
-            <span className="text-graphite font-semibold">Gaurank</span>
+            <span className="text-graphite font-semibold">Gaurank Maheshwari</span>
           </a>
           
           {/* Apple-style Desktop Navigation */}

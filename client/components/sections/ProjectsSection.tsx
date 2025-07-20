@@ -6,67 +6,81 @@ import { ExternalLink, ChevronRight } from "lucide-react";
 
 const projects = [
   {
-    title: "Study on Transparency in AI-Generated News Summaries",
-    subtitle: "Capstone Project - RIT",
-    period: "Jan 2024 - Present",
+    title: "RiskScope",
+    subtitle: "Georgia Tech Hackathon",
+    period: "2024",
     description:
-      "Advanced research on reducing hallucinations and enhancing transparency in bias detection for AI-generated content.",
+      "AI-driven disaster risk analysis and insurance pricing platform leveraging FEMA data to inform pricing strategies.",
     highlights: [
-      "Reduced hallucinations by over 90%",
-      "Enhanced transparency in bias detection",
-      "Established key area for ongoing research",
+      "Risk Zone Identification: Categorized all 50 states into low, moderate, and high-risk zones by analyzing disaster frequency and severity",
+      "Insurance Price Prediction: Trained regression models to recommend insurance premiums for each risk zone, supporting data-backed pricing decisions",
+      "Interactive Visualization: Built a Streamlit dashboard with Plotly maps to explore risk zones and pricing recommendations in real time",
+      "Data Preprocessing & Scalability: Engineered robust data cleaning and imputation pipelines to handle inconsistent FEMA datasets, enabling scalable analysis",
     ],
-    tech: ["GPT-3.5", "Hugging Face", "TensorFlow", "Python", "LlaMA-2"],
-    status: "Research",
-    hasDemo: false,
-  },
-  {
-    title: "LangChain-Based Conversational Agent",
-    subtitle: "Knowledge Extraction & Q&A System",
-    period: "Nov 2024 - Dec 2024",
-    description:
-      "Developed advanced conversational agent using FAISS for document retrieval and GPT for contextually relevant answers.",
-    highlights: [
-      "30% accuracy improvement across 100+ queries",
-      "Real-time interaction interface",
-      "Handles 50+ concurrent queries",
-    ],
-    tech: ["LangChain", "Hugging Face", "OpenAI API", "FAISS", "Streamlit"],
+    tech: ["Python", "Streamlit", "Plotly", "FEMA API", "Machine Learning", "Geospatial Analysis"],
     status: "Completed",
-    hasDemo: true,
+    hasDemo: false,
+    githubUrl: "https://github.com/GogoRit/Hacklytics-Challenge",
   },
   {
-    title: "NFT Scarcity Optimization System",
-    subtitle: "EVOLV - DeMons Project",
-    period: "Jan 2023 - July 2023",
+    title: "QnA-RAG-App with Gemma & Groq API",
+    subtitle: "RAG Application",
+    period: "2024",
     description:
-      "Data-driven models for NFT scarcity optimization using statistical modeling and user engagement metrics.",
+      "Scalable retrieval-augmented Q&A application combining Gemma language models with the Groq API for fast, context-aware answers.",
     highlights: [
-      "15% increase in scarcity value",
-      "200+ community participants engaged",
-      "20% improvement in scarcity factor",
+      "Gemma Integration: Utilizes Gemma for advanced generative Q&A capabilities",
+      "Groq API: Provides high-performance retrieval of relevant documents at scale",
+      "Retrieval-Augmented Generation: Merges generative and retrieval systems for accurate, context-rich responses",
+      "Interactive UI: Built with Python and Streamlit for a user-friendly interface",
+      "Scalable Architecture: Designed to handle large datasets and concurrent users",
     ],
-    tech: ["Python", "Statistical Modeling", "Data Analytics"],
-    status: "Production",
+    tech: ["Python", "Streamlit", "Gemma", "Groq API", "RAG", "LangChain"],
+    status: "Completed",
     hasDemo: false,
+    githubUrl: "https://github.com/GogoRit/QnA-RAG-App-with-Gemma-and-Groq-API",
+  },
+  {
+    title: "Financial-Agentic-AI-chatbot",
+    subtitle: "Financial AI Agent",
+    period: "2024",
+    description:
+      "Cloud-deployed, API-driven Financial Agentic AI that analyzes market data and delivers insights at scale.",
+    highlights: [
+      "Integrated Data Sources: Aggregates data from PHI Data, Yahoo Finance (yfinance), and DuckDuckGo for comprehensive financial context",
+      "Scalable Architecture: Leverages Groq Cloud Playground to handle large volumes of queries with minimal latency",
+      "API-Driven Design: Built on FastAPI and Uvicorn for seamless integration and rapid deployment",
+      "User-Friendly Deployment: Packaged for easy setup via `pip install -r requirements.txt` and one-click launch in Groq Cloud Playground",
+    ],
+    tech: ["Python", "FastAPI", "Uvicorn", "Groq Cloud", "yfinance", "DuckDuckGo API"],
+    status: "Completed",
+    hasDemo: false,
+    githubUrl: "https://github.com/GogoRit/Financial-Agentic-AI-chatbot",
   },
 ];
 
 const ProjectsSection: React.FC = () => (
-  <section id="projects" className="pt-16 lg:pt-20 pb-16 min-h-screen">
+  <section id="projects" className="pt-16 lg:pt-20 pb-12">
     <div className="container mx-auto px-4">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl lg:text-4xl font-bold text-center mb-16">
+        <h2 className="text-3xl lg:text-4xl font-bold text-center mb-12">
           Featured <span className="gradient-text">Projects</span>
         </h2>
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-1 gap-6 max-w-4xl mx-auto">
           {projects.map((project, index) => (
             <Card key={index} className="glass-card-hover group cursor-pointer">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle className="text-xl group-hover:text-primary transition-colors">
-                      {project.title}
+                      <a 
+                        href={project.githubUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="hover:text-primary transition-colors"
+                      >
+                        {project.title}
+                      </a>
                     </CardTitle>
                     <CardDescription className="mt-1">
                       {project.subtitle} • {project.period}
@@ -105,12 +119,14 @@ const ProjectsSection: React.FC = () => (
                     </span>
                   ))}
                 </div>
-                {project.hasDemo && (
-                  <Button variant="ghost" size="sm" className="w-full">
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    View Demo
-                  </Button>
-                )}
+                <div className="flex gap-2">
+                  {project.hasDemo && (
+                    <Button variant="ghost" size="sm">
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      View Demo
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))}

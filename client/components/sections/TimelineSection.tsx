@@ -9,11 +9,11 @@ const timelineItems = [
     period: "Jan 2025 - Present",
     location: "Rochester, NY",
     description:
-      "Developing AI-driven summarization and transcript retrieval to reduce podcast discovery time by up to 7x, enhancing user engagement with curated content.",
+      "Led technical development of a transcript-first platform with personalized delivery and AI-driven workflows, reaching ~86% attribution accuracy by MVP stage, with ongoing improvements, tiered access and automated email workflows.",
     highlights: [
-      "Designing scalable pipeline to process millions of podcast episodes",
-      "Leveraging LangChain and Hugging Face models",
-      "Supporting projected 652M global listeners by 2027",
+      "Deployed a production-ready MVP demo (internal + investor access) that automates speaker-aware transcription and delivery workflows",
+      "Improved content readability and discovery by up to 7× across 5,000+ podcast episodes",
+      "Enhanced user engagement with curated content through AI-driven workflows",
     ],
     tech: [
       "React",
@@ -36,21 +36,21 @@ const timelineItems = [
   },
   {
     title: "Research Trainee @ AWARE-AI NSF Program",
-    period: "Aug 2024 - Present",
+    period: "Aug 2024 - Aug 2025",
     location: "Rochester, NY",
     description:
       "Engineered AI systems for multimodal information processing, enhancing human-AI interaction across 4 use cases.",
     highlights: [
-      "Improved user engagement by 30% based on feedback metrics",
-      "Participated in lab rotations across 3+ AI labs",
-      "Contributed to robot-human collaboration project using genetic algorithms, improving efficiency by 20%",
+      "Introduced innovative features that improved user engagement by 30% based on feedback metrics",
+      "Participated in lab rotations across 3+ AI labs, contributing to a robot-human collaboration project using genetic algorithms",
+      "Improved efficiency by 20% through genetic algorithm implementation in robot-human collaboration",
     ],
-    tech: ["AI Systems", "Multimodal Processing", "Genetic Algorithms"],
+    tech: ["AI Systems", "Multimodal Processing", "Genetic Algorithms", "Human-AI Interaction"],
     type: "research",
   },
   {
     title: "Graduate Teaching Assistant @ RIT",
-    period: "Aug 2024 - Present",
+    period: "Aug 2024 - May 2025",
     location: "Rochester, NY",
     description:
       "Teaching Neural Networks (DSCI-640) and Applied Data Science (DSCI-601) in the Department of Software Engineering.",
@@ -67,25 +67,25 @@ const timelineItems = [
     period: "Jan 2023 - July 2023",
     location: "Bengaluru, INDIA",
     description:
-      "Engineered data-driven models to improve NFT scarcity at 18-employee venture-backed startup.",
+      "Engineered data-driven models to optimize NFT scarcity using user engagement metrics and rule-based parameter tuning.",
     highlights: [
-      "15% increase in scarcity value by adjusting 5+ parameters",
-      "200+ active participants for future token launches",
-      "20% improvement in scarcity factor, 10% increase in perceived value",
+      "Tuned 5+ scarcity parameters, yielding a 15% increase in overall scarcity value across the collection",
+      "Applied statistical modeling to boost the scarcity factor by 20%",
+      "Increased the perceived value of 666 limited DeMons NFTs by 10%",
     ],
-    tech: ["Python", "Statistical Modeling", "Data Analytics", "NFT"],
+    tech: ["Python", "Statistical Modeling", "Data Analytics", "NFT", "Rule-based Systems"],
     type: "work",
   },
 ];
 
 const TimelineSection: React.FC = () => (
-  <section id="timeline" className="pt-16 lg:pt-20 pb-16 bg-muted/20 min-h-screen">
+  <section id="timeline" className="pt-16 lg:pt-20 pb-12 bg-muted/20">
     <div className="container mx-auto px-4">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-3xl lg:text-4xl font-bold text-center mb-16">
+        <h2 className="text-3xl lg:text-4xl font-bold text-center mb-12">
           Career Timeline & <span className="gradient-text">Tech Evolution</span>
         </h2>
-        <div className="space-y-8">
+        <div className="space-y-6">
           {timelineItems.map((item, index) => (
             <div key={index} className="flex gap-6 group">
               <div className="flex flex-col items-center">

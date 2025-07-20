@@ -79,6 +79,11 @@
       "name": "LangChain Q&A Agent",
       "description": "Developed a LangChain-based knowledge-extraction tool with FAISS and GPT, improving retrieval accuracy by 30% over 100+ queries. Delivered in a Streamlit UI.",
       "tech": ["LangChain", "FAISS", "OpenAI API", "Hugging Face", "Streamlit"]
+    },
+    {
+      "name": "1% Better (Stealth)",
+      "description": "Working on 1% Better, a stealth productivity and automation startup. Focused on modernizing non-technical office workflows through AI agents and systems that reduce manual bottlenecks in daily operations. Currently in domain expert feedback and validation stage.",
+      "tech": ["FastAPI", "LangChain", "OpenAI", "React", "Docker"]
     }
   ],
   "skills": {
@@ -143,4 +148,4 @@
     "Enjoys motivational films such as ‘The Social Network’, ‘3 Idiots’, and ‘The Pursuit of Happyness’, but balances them with plenty of comedy because laughter builds resilience.",
     "Known to quote lines like: ‘Great men are not born great… they grow great.’ (The Godfather) or ‘We accept the love we think we deserve.’ (The Perks of Being a Wallflower)."
   ]
-} 
+}

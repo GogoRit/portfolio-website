@@ -5,7 +5,7 @@ import { EmbeddedChat } from "../EmbeddedChat";
 import { MapPin, GraduationCap, Building } from "lucide-react";
 
 const HeroSection: React.FC = () => (
-  <section id="home" className="pt-24 lg:pt-32 pb-12 relative overflow-hidden min-h-screen">
+  <section id="hero" className="pt-20 lg:pt-24 pb-12 relative overflow-hidden min-h-screen">
     {/* Apple-style background with subtle gradients */}
     <div className="absolute inset-0 bg-gradient-to-br from-silver/30 via-white to-blue/5"></div>
     
@@ -18,7 +18,7 @@ const HeroSection: React.FC = () => (
 
     <div className="container mx-auto px-6 relative z-10">
       <div className="max-w-5xl mx-auto text-center">
-        <div className="space-y-8 animate-slide-up">
+        <div className="space-y-6 animate-slide-up">
           {/* Main heading with Apple-style typography */}
           <h1 className="text-6xl lg:text-8xl font-light leading-tight tracking-tight">
             Hi, I'm{" "}
@@ -37,9 +37,9 @@ const HeroSection: React.FC = () => (
           
           {/* Subtitle with improved typography */}
           <p className="text-xl lg:text-2xl text-graphite/80 max-w-4xl mx-auto font-light leading-relaxed">
-            AI Developer at Magic Spell Studios & MS Data Science student at
-            RIT (4.0 GPA). Specializing in LangChain, Generative AI, and
-            scalable ML systems for real-world applications.
+            AI Developer @ Magic Spell Studios | MS Data Science @ RIT.
+            <br />
+            Proficient in delivering full-stack AI-agent solutions: from requirement gathering and system design to integrating third-party services, deploying microservices, and driving continuous product enhancements.
           </p>
           
           {/* Apple-style info badges */}
@@ -59,30 +59,51 @@ const HeroSection: React.FC = () => (
           </div>
           
           {/* Apple-style action buttons */}
-          <div className="flex flex-wrap justify-center gap-4 pt-12">
-            <Button 
-              size="lg" 
-              className="bg-blue text-white hover:bg-blue/90 shadow-apple-sm hover:shadow-apple-md transition-all duration-apple ease-apple-ease hover:scale-105 rounded-apple-pill px-8 py-3"
+          <div className="flex flex-wrap justify-center gap-4 pt-8">
+            <a
+              href="/Gaurank_Maheshwari_Resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="View Resume PDF"
             >
-              <Download className="w-5 h-5 mr-2" />
-              Resume
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="bg-white/80 backdrop-blur-sm border-silver/30 text-graphite hover:bg-white/90 hover:border-silver/50 shadow-apple-sm hover:shadow-apple-md transition-all duration-apple ease-apple-ease hover:scale-105 rounded-apple-pill px-8 py-3"
+              <Button 
+                size="lg" 
+                className="bg-blue text-white hover:bg-blue/90 shadow-apple-sm hover:shadow-apple-md transition-all duration-apple ease-apple-ease hover:scale-105 rounded-apple-pill px-8 py-3"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                Resume
+              </Button>
+            </a>
+            <a
+              href="https://github.com/GogoRit"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="View GitHub profile"
             >
-              <Github className="w-5 h-5 mr-2" />
-              GitHub
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="bg-white/80 backdrop-blur-sm border-silver/30 text-graphite hover:bg-white/90 hover:border-silver/50 shadow-apple-sm hover:shadow-apple-md transition-all duration-apple ease-apple-ease hover:scale-105 rounded-apple-pill px-8 py-3"
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="bg-white/80 backdrop-blur-sm border-silver/30 text-graphite hover:bg-white/90 hover:border-silver/50 hover:text-blue shadow-apple-sm hover:shadow-apple-md transition-all duration-apple ease-apple-ease hover:scale-105 rounded-apple-pill px-8 py-3"
+              >
+                <Github className="w-5 h-5 mr-2" />
+                GitHub
+              </Button>
+            </a>
+            <a
+              href="https://www.linkedin.com/in/gaurank/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="View LinkedIn profile"
             >
-              <Linkedin className="w-5 h-5 mr-2" />
-              LinkedIn
-            </Button>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="bg-white/80 backdrop-blur-sm border-silver/30 text-graphite hover:bg-white/90 hover:border-silver/50 hover:text-blue shadow-apple-sm hover:shadow-apple-md transition-all duration-apple ease-apple-ease hover:scale-105 rounded-apple-pill px-8 py-3"
+              >
+                <Linkedin className="w-5 h-5 mr-2" />
+                LinkedIn
+              </Button>
+            </a>
           </div>
         </div>
       </div>
