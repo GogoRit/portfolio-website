@@ -18,6 +18,7 @@ const skillCategories = {
     "Autogen",
   ],
   "🛠️ Tools & Platforms": [
+    "Airtable",
     "Docker",
     "AWS (RDS, S3, SES)",
     "Redis",
@@ -25,8 +26,14 @@ const skillCategories = {
     "Deepgram Nova",
     "OpenAI API",
     "Celery",
+    "Zapier",
+    "API Integration Tools",
   ],
   "🧠 Core Competencies": [
+    "Workflow Automation",
+    "Database Design & Management",
+    "Data Analytics & Migration",
+    "Process Optimization",
     "Generative & Agentic AI",
     "Prompt Engineering",
     "LLM fine‑tuning",

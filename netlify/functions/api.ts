@@ -38,10 +38,17 @@ const profile = {
     }
   ],
   "current_role": {
+    "title": "Data & Workflow Automation Intern",
+    "company": "RIT Venture Creations Incubator",
+    "start": "August 2025",
+    "summary": "Focus on migrating existing processes into Airtable, creating database systems, building automation, and streamlining workflows to improve operations. This role complements my background in AI by expanding into data systems, analytics, and process optimization."
+  },
+  "previous_role": {
     "title": "AI Developer",
     "company": "MAGIC Spell Studios",
     "start": "Jan 2025",
-    "summary": "Leading development of aiPaperboyz – an AI-powered podcast-summarization and transcript-delivery platform."
+    "end": "August 2025",
+    "summary": "Led development of aiPaperboyz – an AI-powered podcast-summarization and transcript-delivery platform."
   },
   "projects": [
     {
@@ -57,7 +64,9 @@ const profile = {
   ],
   "skills": {
     "languages": ["Python", "TypeScript", "Java", "SQL", "HTML", "LaTeX"],
-    "frameworks": ["LangChain", "LangFlow", "Crew AI", "Swarm", "Autogen", "PyTorch", "FastAPI", "React", "Tailwind CSS"]
+    "frameworks": ["LangChain", "LangFlow", "Crew AI", "Swarm", "Autogen", "PyTorch", "FastAPI", "React", "Tailwind CSS"],
+    "tools": ["Airtable", "Docker", "PostgreSQL", "Firebase", "AWS SES", "OpenAI API", "Deepgram", "GitHub", "Zapier", "API Integration Tools"],
+    "concepts": ["Workflow Automation", "Database Design & Management", "Data Analytics & Migration", "Process Optimization", "Generative AI", "Agentic AI", "Prompt Engineering", "RAG", "MLOps"]
   }
 };
 

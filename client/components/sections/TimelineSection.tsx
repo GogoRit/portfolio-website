@@ -5,8 +5,32 @@ import { Calendar, MapPin, ChevronRight } from "lucide-react";
 
 const timelineItems = [
   {
-    title: "AI Developer @ Magic Spell Studios",
-    period: "Jan 2025 - Present",
+    title: "Data & Workflow Automation Intern @ RIT Venture Creations Incubator",
+    period: "August 2025 - Present",
+    location: "Rochester, NY",
+    description:
+      "Focus on migrating existing processes into Airtable, creating database systems, building automation, and streamlining workflows to improve operations. This role complements my background in AI by expanding into data systems, analytics, and process optimization.",
+    highlights: [
+      "Migrating legacy processes into Airtable to create scalable database systems",
+      "Building automation workflows to streamline operations and reduce manual tasks",
+      "Implementing data analytics solutions to optimize business processes",
+      "Expanding expertise from AI development into comprehensive data systems management",
+    ],
+    tech: [
+      "Airtable",
+      "Database Design",
+      "Workflow Automation",
+      "Data Analytics",
+      "Process Optimization",
+      "Python",
+      "API Integration",
+      "Data Migration",
+    ],
+    type: "work",
+  },
+  {
+    title: "AI Developer @ MAGIC Spell Studios",
+    period: "Jan 2025 - August 2025",
     location: "Rochester, NY",
     description:
       "Led technical development of a transcript-first platform with personalized delivery and AI-driven workflows, reaching ~86% attribution accuracy by MVP stage, with ongoing improvements, tiered access and automated email workflows.",

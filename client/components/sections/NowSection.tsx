@@ -11,7 +11,7 @@ const NowSection: React.FC = () => (
         <h2 className="text-3xl lg:text-4xl font-bold mb-6">
           Now — Building <span className="gradient-text">1% Better, Every Day</span>
         </h2>
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="glass-card text-left">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -55,20 +55,45 @@ const NowSection: React.FC = () => (
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Building className="w-5 h-5 text-primary" />
-                AI Developer @ Magic Spell Studios
+                Data & Workflow Automation Intern @ RIT Venture Creations
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">
-                Engineered and launched the MVP of a full-stack AI-driven podcast 
-                transcript discovery platform—indexing millions of episodes and 
-                delivering a standalone, read-only consumption experience. The MVP 
-                is in private testing—happy to demo it during interviews.
+                Currently migrating existing processes into Airtable, creating database 
+                systems, and building automation workflows to streamline operations. 
+                Expanding my expertise from AI development into comprehensive data 
+                systems, analytics, and process optimization.
               </p>
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
-                  Jan 2025 - Present
+                  August 2025 - Present
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card text-left">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Badge className="w-5 h-5 text-blue-500" />
+                AI Developer @ MAGIC Spell Studios
+              </CardTitle>
+              <div className="text-xs text-muted-foreground mt-1">
+                Recently Completed • Jan-Aug 2025
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Successfully engineered and launched the MVP of aiPaperboyz—a full-stack 
+                AI-driven podcast transcript platform indexing millions of episodes. 
+                Delivered production-ready demo with 86% attribution accuracy.
+              </p>
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-4 h-4" />
+                  Jan 2025 - August 2025
                 </span>
               </div>
             </CardContent>

@@ -32,10 +32,10 @@
     }
   ],
   "current_role": {
-    "title": "AI Developer",
-    "company": "MAGIC Spell Studios",
-    "start": "Jan 2025",
-    "summary": "Leading development of aiPaperboyz – an AI-powered podcast-summarization and transcript-delivery platform. Built a scalable FastAPI/PostgreSQL backend, a Deepgram + GPT-4 enrichment pipeline, an email-delivery scheduler with AWS SES, and a secure React/TypeScript frontend with Firebase Auth and Tailwind CSS. Deployed CI/CD via Docker and GitHub Actions."
+    "title": "Data & Workflow Automation Intern",
+    "company": "RIT Venture Creations Incubator",
+    "start": "August 2025",
+    "summary": "Focus on migrating existing processes into Airtable, creating database systems, building automation, and streamlining workflows to improve operations. This role complements my background in AI by expanding into data systems, analytics, and process optimization."
   },
   "research": [
     {
@@ -50,6 +50,13 @@
     }
   ],
   "work_experience": [
+    {
+      "title": "AI Developer",
+      "company": "MAGIC Spell Studios",
+      "start": "Jan 2025",
+      "end": "August 2025",
+      "summary": "Led development of aiPaperboyz – an AI-powered podcast-summarization and transcript-delivery platform. Built a scalable FastAPI/PostgreSQL backend, a Deepgram + GPT-4 enrichment pipeline, an email-delivery scheduler with AWS SES, and a secure React/TypeScript frontend with Firebase Auth and Tailwind CSS. Deployed CI/CD via Docker and GitHub Actions."
+    },
     {
       "title": "Junior Data Scientist",
       "company": "EVOLV (DeMons), Bengaluru, India",
@@ -102,6 +109,7 @@
       "Hugging Face Transformers"
     ],
     "tools": [
+      "Airtable",
       "Docker",
       "PostgreSQL",
       "Firebase",
@@ -114,9 +122,15 @@
       "FAISS",
       "Tableau",
       "Vite",
-      "Notion"
+      "Notion",
+      "Zapier",
+      "API Integration Tools"
     ],
     "concepts": [
+      "Workflow Automation",
+      "Database Design & Management",
+      "Data Analytics & Migration",
+      "Process Optimization",
       "Generative AI",
       "Agentic AI",
       "Prompt Engineering",
