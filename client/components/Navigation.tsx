@@ -223,25 +223,33 @@ const Navigation: React.FC = () => {
         ultraShortSectionObserver.observe(el);
       } else if (sectionId === 'research' || sectionId === 'now') {
         shortSectionObserver.observe(el);
+      } else if (sectionId === 'timeline') {
+        // Use a higher threshold for timeline to prevent early activation
+        shortSectionObserver.observe(el);
       } else {
         longSectionObserver.observe(el);
       }
     });
 
-    // Special handling for Contact section at bottom
-    const handleScrollBottom = () => {
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 10) {
+    // Special handling for Hero section at top and Contact section at bottom
+    const handleScrollPosition = () => {
+      // If we're at the very top, ensure Hero is active
+      if (window.scrollY <= 50) {
+        setActiveSection("#hero");
+      }
+      // If we're at the bottom, ensure Contact is active
+      else if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 10) {
         setActiveSection("#contact");
       }
     };
 
-    window.addEventListener("scroll", handleScrollBottom);
+    window.addEventListener("scroll", handleScrollPosition);
 
     return () => {
       longSectionObserver.disconnect();
       shortSectionObserver.disconnect();
       ultraShortSectionObserver.disconnect();
-      window.removeEventListener("scroll", handleScrollBottom);
+      window.removeEventListener("scroll", handleScrollPosition);
     };
   }, [headerHeight]);
 
