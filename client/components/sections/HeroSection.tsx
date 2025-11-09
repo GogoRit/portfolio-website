@@ -37,9 +37,9 @@ const HeroSection: React.FC = () => (
           
           {/* Subtitle with improved typography */}
           <p className="text-xl lg:text-2xl text-graphite/80 max-w-4xl mx-auto font-light leading-relaxed">
-            Data & Workflow Automation Intern @ RIT Venture Creations | Former AI Developer @ MAGIC Spell Studios | MS Data Science @ RIT.
+          Machine Learning / AI Engineer | LLM Pipelines · GPU Optimization (PyTorch/CUDA/TensorRT) · LangChain | AAAI-26 Spotlight Author (Top 11%)
             <br />
-            Expanding from AI systems into data automation and workflow optimization, delivering scalable solutions from database design to process enhancement.
+            Building and Deploying production-grade LLM/AI systems, with deep expertise in GPU acceleration, low-latency inference, and scalable system architecture 
           </p>
           
           {/* Apple-style info badges */}
@@ -54,7 +54,7 @@ const HeroSection: React.FC = () => (
             </span>
             <span className="flex items-center gap-2 px-4 py-2 rounded-apple-pill bg-silver/50 backdrop-blur-sm border border-silver/30">
               <Building className="w-4 h-4" />
-              RIT Venture Creations
+              M.S. Data Science
             </span>
           </div>
           

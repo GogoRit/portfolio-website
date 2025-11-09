@@ -6,21 +6,24 @@ import { ExternalLink, ChevronRight } from "lucide-react";
 
 const researchProjects = [
   {
-    title: "NewsLens AI: NER-Guided Summarization for Transparent News",
-    subtitle: "Capstone Project - RIT",
+    title: "NewsLensAI: NER-Guided Summarization for Mitigating Hallucination and Bias in LLM-Based News Summaries",
+    subtitle: "AAAI 2026 • Capstone Project - RIT",
     period: "Jan 2024 - May 2025",
     description:
-      "Designed and implemented a NER-guided summarization pipeline for LLMs, applied to 1,500 real-world news articles to improve factual alignment and reduce hallucinations.",
+      "Designed and implemented a NER-guided summarization pipeline for LLMs, applied to 1,500 real-world news articles to improve factual alignment and reduce hallucinations. Accepted to AAAI 2026 (Student Abstract) and selected for spotlight oral presentation in Singapore, January 2026.",
     highlights: [
+      "Accepted to AAAI 2026 (Association for the Advancement of Artificial Intelligence) in the Student Abstract submission category",
+      "Selected for spotlight 3-minute oral presentation at AAAI 2026 in Singapore, January 2026",
+      "Nominated for Best Abstract Competition at AAAI 2026",
       "Improved factual alignment by 9.8% BERTScore, reducing hallucinated entities by ~30% using entity-aware prompting",
       "Evaluated model outputs for bias, sentiment, and toxicity, achieving a 35% reduction in bias drift and ~60% drop in toxicity",
       "Maintained source tone and entity fidelity while enhancing transparency in AI-generated news summaries",
     ],
     tech: ["GPT-3.5", "Hugging Face Transformers", "TensorFlow", "Python 3", "LlaMA-2"],
-    status: "Research",
+    status: "Published",
     hasDemo: false,
     hasResearchPaper: true,
-    researchPaperUrl: "/Capstone_Research.pdf",
+    researchPaperUrl: "/AAAI-26_SAPP_supp_230.pdf",
   },
 ];
 
@@ -53,7 +56,7 @@ const ResearchSection: React.FC = () => (
                   </div>
                   <Badge
                     variant={
-                      project.status === "Completed"
+                      project.status === "Completed" || project.status === "Published"
                         ? "default"
                         : project.status === "Research"
                         ? "secondary"

@@ -1,6 +1,7 @@
 {
   "name": "Gaurank Maheshwari",
-  "title": "AI Developer | Researcher | Data Scientist",
+  "title": "Machine Learning / AI Engineer",
+  "summary": "Machine Learning / AI Engineer with 2+ years of experience specializing in LLM inference optimization, GPU acceleration, and low-latency model deployment. AAAI-26 Spotlight Author (Top 11%) and NSF Trainee focused on building production-grade, efficient systems (CUDA, TensorRT, vLLM). Pursuing M.S. in Data Science at RIT (Dec 2025). STEM OPT eligible.",
   "origin": {
     "hometown": "Kishangarh, Rajasthan, India",
     "current_location": "Rochester, NY, USA"
@@ -15,151 +16,166 @@
   "education": [
     {
       "institution": "Rochester Institute of Technology (RIT)",
-      "degree": "M.S. in Data Science",
+      "degree": "Master of Science in Data Science",
       "gpa": "4.0 / 4.0",
-      "graduation_date": "Dec 2025 (expected)",
-      "courses": [
-        "Neural Networks",
-        "Human Factors in AI",
-        "Applied Statistics",
-        "Software Engineering for Data Science"
-      ]
+      "start": "Aug 2023",
+      "graduation_date": "Dec 2025",
+      "location": "Rochester, NY"
     },
     {
-      "institution": "LNMIIT, Jaipur",
-      "degree": "B.Tech. in Computer Science",
-      "graduation_date": "May 2023"
+      "institution": "The LNM Institute of Information Technology (LNMIIT)",
+      "degree": "Bachelor of Technology in Computer Science",
+      "start": "July 2019",
+      "graduation_date": "May 2023",
+      "location": "Jaipur, India"
     }
   ],
   "current_role": {
-    "title": "Data & Workflow Automation Intern",
-    "company": "RIT Venture Creations Incubator",
-    "start": "August 2025",
-    "summary": "Focus on migrating existing processes into Airtable, creating database systems, building automation, and streamlining workflows to improve operations. This role complements my background in AI by expanding into data systems, analytics, and process optimization."
+    "title": "Automation Engineer",
+    "company": "Venture Creations Incubator (RIT)",
+    "start": "Aug 2025",
+    "end": "Present",
+    "location": "Rochester, NY",
+    "summary": "Migrated 6+ internal workflows to unified database systems using Python + SQL ETL pipelines, improving data reliability and enabling real-time reporting across incubator operations."
   },
   "research": [
     {
-      "program": "AWARE-AI NSF Research Traineeship",
+      "program": "AWARE-AI NSF Research Traineeship Program",
       "start": "Aug 2024",
-      "focus": "Multimodal information processing and human-AI interaction",
-      "impact": "Contributed to a robot–human collaboration project using genetic algorithms, improving task-completion efficiency by 20%.",
-      "labs": [
-        "Multi-Agent Robotics Lab",
-        "Center for Accessibility and Inclusion Research"
+      "end": "Aug 2025",
+      "location": "Rochester, NY",
+      "focus": "Transparent, multimodal ML and human-centered AI",
+      "highlights": [
+        "Optimized multimodal signal pipelines (EEG, EMG, ECG, motion capture) in PyTorch with CUDA (Python); reduced inference latency by ~30%, enabling near real-time deployment in human–robot collaboration (HRC) tasks.",
+        "Benchmarked and accelerated ML inference with TensorRT vs. PyTorch baselines; improved throughput by ~1.5× and validated deployment on UR-10 and Sawyer robots for synchronized HRC experiments."
       ]
     }
   ],
   "work_experience": [
     {
-      "title": "AI Developer",
-      "company": "MAGIC Spell Studios",
+      "title": "AI Engineer",
+      "company": "Magic Spell Studios",
       "start": "Jan 2025",
-      "end": "August 2025",
-      "summary": "Led development of aiPaperboyz – an AI-powered podcast-summarization and transcript-delivery platform. Built a scalable FastAPI/PostgreSQL backend, a Deepgram + GPT-4 enrichment pipeline, an email-delivery scheduler with AWS SES, and a secure React/TypeScript frontend with Firebase Auth and Tailwind CSS. Deployed CI/CD via Docker and GitHub Actions."
+      "end": "Aug 2025",
+      "location": "Rochester, NY",
+      "highlights": [
+        "Designed LangChain multi-agent pipelines for podcast transcription (Deepgram ASR, Hugging Face, GPT); improved token usage to cut inference cost by ~35% and achieve ~86% speaker attribution accuracy on 20k+ episodes (~50k hrs).",
+        "Engineered FastAPI APIs powering the MVP, deployed via AWS + GitLab CI/CD; added latency and cost monitoring that reduced iteration cycles by ~20%."
+      ]
     },
     {
-      "title": "Junior Data Scientist",
-      "company": "EVOLV (DeMons), Bengaluru, India",
-      "start": "Jan 2023",
-      "end": "Jul 2023",
-      "summary": "Built data-driven models to enhance NFT scarcity using behavioral metrics, increasing perceived token value by 10% and boosting launch interest among more than 200 users."
-    },
-    {
-      "title": "Graduate Teaching Assistant",
-      "company": "RIT",
+      "title": "Applied Research Engineer",
+      "company": "AWARE-AI NSF Research Traineeship Program, RIT",
       "start": "Aug 2024",
-      "summary": "Teaching Assistant for DSCI-640 (Neural Networks) and DSCI-601 (Applied Data Science); helped students debug models, apply ML algorithms, and structure deep-learning pipelines."
+      "end": "Aug 2025",
+      "location": "Rochester, NY",
+      "highlights": [
+        "Optimized multimodal signal pipelines (EEG, EMG, ECG, motion capture) in PyTorch with CUDA (Python); reduced inference latency by ~30%, enabling near real-time deployment in human–robot collaboration (HRC) tasks.",
+        "Benchmarked and accelerated ML inference with TensorRT vs. PyTorch baselines; improved throughput by ~1.5× and validated deployment on UR-10 and Sawyer robots for synchronized HRC experiments."
+      ]
+    },
+    {
+      "title": "Machine Learning Engineer",
+      "company": "DeMons (18-employee venture-backed startup)",
+      "start": "Aug 2022",
+      "end": "Jul 2023",
+      "location": "Bengaluru, India",
+      "highlights": [
+        "Built ML-driven scarcity and drop-timing models using Python/SQL, pandas, NumPy, scikit-learn; applied feature engineering to optimize transaction data, boosting launch engagement by ~18%.",
+        "Revamped statistical valuation models for 600+ digital assets; automated release-timing recommendations and dashboards, improving market value perception of NFT assets by ~10% and strengthening early-stage trading liquidity."
+      ]
     }
   ],
   "projects": [
     {
-      "name": "aiPaperboyz",
-      "description": "An AI-powered podcast-summarization platform with speaker diarization and transcript enrichment using LLM agents. Features scheduled email delivery, a personalized feed, and a secure frontend UI. Built with React, FastAPI, PostgreSQL, AWS SES, Deepgram, and GPT-4.",
-      "tech": ["OpenAI", "Deepgram", "FastAPI", "Docker", "PostgreSQL", "Firebase", "Tailwind CSS", "React", "TypeScript"]
+      "name": "LLM Inference Lab: Research-grade Speculative Decoding Runtime",
+      "description": "Developed PyTorch + CUDA/MPS runtime with custom kernels, KV-cache reuse, batching, and CUDA Graphs, delivering ~2× GPU throughput, full reproducibility, and deterministic profiling; extended with multi-GPU optimizations.",
+      "tech": ["PyTorch", "CUDA", "MPS", "CUDA Graphs", "GPU Optimization", "Python"]
     },
     {
-      "name": "NewsLens AI",
-      "description": "Capstone project that reduced hallucinations in AI-generated news summaries by more than 90% using Gemini, GPT-3.5, and Hugging Face NER; also established a bias-detection metric pipeline.",
-      "tech": ["Gemini", "GPT-3.5", "NER", "Hugging Face", "TensorFlow", "Python"]
+      "name": "CUDA Graph Routing: GPU-Accelerated Shortest Path on NYC Road Network",
+      "description": "Designed a CUDA-parallelized Dijkstra's algorithm on a 11.7M-node, 25.3M-edge graph using CSR layout and optimized SSSP kernels, achieving ~1.8× CPU speedup with memory-efficient loaders and scalable validation tools.",
+      "tech": ["CUDA", "C++", "Graph Algorithms", "Dijkstra's Algorithm", "SSSP", "High-Performance Computing"]
     },
     {
-      "name": "LangChain Q&A Agent",
-      "description": "Developed a LangChain-based knowledge-extraction tool with FAISS and GPT, improving retrieval accuracy by 30% over 100+ queries. Delivered in a Streamlit UI.",
-      "tech": ["LangChain", "FAISS", "OpenAI API", "Hugging Face", "Streamlit"]
-    },
-    {
-      "name": "1% Better (Stealth)",
-      "description": "Working on 1% Better, a stealth productivity and automation startup. Focused on modernizing non-technical office workflows through AI agents and systems that reduce manual bottlenecks in daily operations. Currently in domain expert feedback and validation stage.",
-      "tech": ["FastAPI", "LangChain", "OpenAI", "React", "Docker"]
+      "name": "NewsLensAI: NER-Guided Summarization for Mitigating Hallucination and Bias in LLM-Based News Summaries",
+      "description": "Capstone project accepted to AAAI 2026 (Student Abstract). Selected for spotlight 3-minute oral presentation and nominated for Best Abstract Competition. Reduced hallucinations in AI-generated news summaries using Gemini, GPT-3.5, and Hugging Face NER; established a bias-detection metric pipeline.",
+      "tech": ["GPT-3.5", "Hugging Face Transformers", "TensorFlow", "Python 3", "LlaMA-2", "NER"]
     }
   ],
   "skills": {
-    "languages": ["Python", "TypeScript", "Java", "SQL", "HTML", "LaTeX"],
-    "frameworks": [
-      "LangChain",
-      "LangFlow",
-      "Crew AI",
-      "Swarm",
-      "Autogen",
+    "languages": ["Python", "C++", "SQL"],
+    "ml_llm_systems": [
       "PyTorch",
-      "FastAPI",
-      "React",
-      "Tailwind CSS",
-      "Streamlit",
-      "Hugging Face Transformers"
-    ],
-    "tools": [
-      "Airtable",
-      "Docker",
-      "PostgreSQL",
-      "Firebase",
-      "AWS SES",
-      "OpenAI API",
-      "Deepgram",
-      "GitHub",
-      "VS Code",
-      "Jupyter Notebook",
-      "FAISS",
-      "Tableau",
-      "Vite",
-      "Notion",
-      "Zapier",
-      "API Integration Tools"
-    ],
-    "concepts": [
-      "Workflow Automation",
-      "Database Design & Management",
-      "Data Analytics & Migration",
-      "Process Optimization",
-      "Generative AI",
-      "Agentic AI",
+      "Hugging Face Transformers",
+      "LangChain",
+      "vLLM",
       "Prompt Engineering",
-      "Retrieval-Augmented Generation (RAG)",
-      "Fine-Tuning",
-      "MLOps",
-      "Bias & Hallucination Detection",
-      "Multimodal AI"
+      "DeepSpeed"
+    ],
+    "gpu_acceleration": [
+      "CUDA",
+      "TensorRT",
+      "Mixed-Precision",
+      "GPU Profiling",
+      "Parallelization",
+      "Quantization",
+      "Pruning"
+    ],
+    "mlops_deployment": [
+      "Docker",
+      "FastAPI",
+      "MLflow",
+      "AWS (EC2, S3, SageMaker, Bedrock)",
+      "GitLab CI/CD",
+      "Kubernetes (K8s)"
+    ],
+    "data_feature_systems": [
+      "pandas",
+      "NumPy",
+      "FAISS",
+      "Redis",
+      "Pinecone"
+    ],
+    "foundations": [
+      "Algorithms & Data Structures",
+      "OOP",
+      "Software Engineering Best Practices"
     ]
   },
+  "honors_awards": [
+    {
+      "title": "AAAI-26 Spotlight (Top 11%)",
+      "description": "NewsLensAI · Selected for Oral + Best Abstract shortlist; awarded travel funding from NSF AWARE-AI and RIT Graduate School to present in Singapore.",
+      "year": "2026"
+    },
+    {
+      "title": "NSF AWARE-AI Research Trainee",
+      "description": "2024–25: Focus on transparent, multimodal ML and human-centered AI at RIT.",
+      "year": "2024-2025"
+    }
+  ],
   "traits": {
     "strengths": [
-      "Clear communicator with a deep understanding of LLM and agentic pipelines",
-      "Translates research insights into scalable product systems",
-      "Thrives in iterative, founder-style build cycles",
-      "Balances full-stack responsibilities with model optimization"
+      "Results-driven engineer with proven track record of delivering production-grade ML systems with measurable performance improvements (35% cost reduction, 2× throughput gains)",
+      "Strong technical communicator who bridges research and product development, translating complex ML concepts into actionable business solutions",
+      "Collaborative team player with experience working in fast-paced startup environments and cross-functional research teams",
+      "Production-focused mindset: designs for scalability, observability, and maintainability from day one",
+      "Continuous learner with expertise spanning LLM optimization, GPU acceleration, and MLOps—stays current with cutting-edge research and industry best practices",
+      "Data-driven decision maker: uses metrics and profiling to guide optimization efforts and validate improvements"
     ],
-    "weaknesses": [
-      "Tends to over-polish and over-document by default",
-      "May over-engineer if early constraints are not clearly defined",
-      "Can over-commit without scoped timelines"
+    "growth_areas": [
+      "Actively working on balancing thoroughness with speed-to-market in early-stage product development",
+      "Developing stronger stakeholder management skills for aligning technical decisions with business priorities",
+      "Enhancing project scoping abilities to better estimate timelines and manage expectations"
     ]
   },
   "fun_facts": [
-    "Loves to travel and explore uncharted places — from spontaneous road trips to structured adventure itineraries — and is especially fond of motorbike journeys.",
-    "Has gone bungee-jumping in Rishikesh and is always chasing the next adrenaline rush.",
-    "Former state-level cricket player in Rajasthan; applies lessons of discipline, strategy, and teamwork from the pitch to the codebase.",
-    "Cooks great food — especially fusion and Indian-spiced meals — and pairs it with carefully curated playlists that match mood, tempo, and flow.",
-    "Enjoys motivational films such as ‘The Social Network’, ‘3 Idiots’, and ‘The Pursuit of Happyness’, but balances them with plenty of comedy because laughter builds resilience.",
-    "Known to quote lines like: ‘Great men are not born great… they grow great.’ (The Godfather) or ‘We accept the love we think we deserve.’ (The Perks of Being a Wallflower)."
+    "Avid traveler who enjoys exploring new places and cultures, from spontaneous road trips to structured adventure itineraries.",
+    "Former competitive athlete who applies lessons in discipline, strategy, and teamwork from sports to collaborative engineering projects.",
+    "Enjoys cooking and experimenting with fusion cuisine, finding it a creative outlet that complements technical problem-solving.",
+    "Tech enthusiast who follows the latest developments in AI research and enjoys reading papers from top-tier conferences like NeurIPS, ICML, and AAAI.",
+    "Believes in continuous learning and often contributes to open-source projects, particularly in the ML/AI space.",
+    "Enjoys balancing technical work with creative pursuits, finding that diverse interests enhance problem-solving approaches."
   ]
 }
