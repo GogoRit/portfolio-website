@@ -10,16 +10,16 @@ const projects = [
     subtitle: "Research Project",
     period: "2024",
     description:
-      "Developed PyTorch + CUDA/MPS runtime with custom kernels, KV-cache reuse, batching, and CUDA Graphs, delivering ~2× GPU throughput, full reproducibility, and deterministic profiling; extended with multi-GPU optimizations.",
+      "Developing PyTorch + CUDA/MPS runtime with custom kernels, KV-cache reuse, batching, and CUDA Graphs, targeting ~2× GPU throughput, full reproducibility, and deterministic profiling; extending with multi-GPU optimizations.",
     highlights: [
       "Custom CUDA/MPS kernels for optimized GPU performance",
       "KV-cache reuse and batching for improved throughput",
       "CUDA Graphs integration for deterministic profiling",
       "Multi-GPU optimizations for scalable inference",
-      "Achieved ~2× GPU throughput improvement",
+      "Targeting ~2× GPU throughput improvement",
     ],
     tech: ["PyTorch", "CUDA", "MPS", "CUDA Graphs", "GPU Optimization", "Python"],
-    status: "Research",
+    status: "In Progress",
     hasDemo: false,
     githubUrl: "https://github.com/GogoRit/llm-inference-lab",
   },
@@ -28,17 +28,17 @@ const projects = [
     subtitle: "High-Performance Computing Project",
     period: "2024",
     description:
-      "Designed a CUDA-parallelized Dijkstra's algorithm on a 11.7M-node, 25.3M-edge graph using CSR layout and optimized SSSP kernels, achieving ~1.8× CPU speedup with memory-efficient loaders and scalable validation tools.",
+      "Designing a CUDA-parallelized Dijkstra's algorithm on a 11.7M-node, 25.3M-edge graph using CSR layout and optimized SSSP kernels, targeting ~1.8× CPU speedup with memory-efficient loaders and scalable validation tools.",
     highlights: [
       "CUDA-parallelized Dijkstra's algorithm implementation",
       "Optimized for large-scale graphs (11.7M nodes, 25.3M edges)",
       "CSR (Compressed Sparse Row) layout for memory efficiency",
       "Optimized Single-Source Shortest Path (SSSP) kernels",
       "Memory-efficient loaders and scalable validation tools",
-      "Achieved ~1.8× speedup over CPU implementation",
+      "Targeting ~1.8× speedup over CPU implementation",
     ],
     tech: ["CUDA", "C++", "Graph Algorithms", "Dijkstra's Algorithm", "SSSP", "High-Performance Computing"],
-    status: "Completed",
+    status: "In Progress",
     hasDemo: false,
     githubUrl: "https://github.com/GogoRit/GigaRoute",
   },
@@ -128,6 +128,8 @@ const ProjectsSection: React.FC = () => (
                       project.status === "Completed"
                         ? "default"
                         : project.status === "Research"
+                        ? "secondary"
+                        : project.status === "In Progress"
                         ? "secondary"
                         : "outline"
                     }
