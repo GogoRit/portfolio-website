@@ -3,6 +3,241 @@ import express from "express";
 import OpenAI from "openai";
 import multer from "multer";
 
+// LeetCode API types and logic (embedded to avoid import issues in Netlify)
+interface LeetCodeBadge {
+  id: string;
+  name: string;
+  icon: string;
+}
+
+interface LeetCodeStats {
+  username: string;
+  ranking: number | null;
+  solved: {
+    total: number;
+    easy: number;
+    medium: number;
+    hard: number;
+  };
+  streak: {
+    current: number;
+    max: number;
+  };
+  badges: LeetCodeBadge[];
+  totalActiveDays: number;
+  updatedAt: string;
+}
+
+interface LeetCodeGraphQLResponse {
+  data?: {
+    matchedUser: {
+      username: string;
+      profile: {
+        ranking: number;
+      };
+      submitStatsGlobal: {
+        acSubmissionNum: Array<{
+          difficulty: string;
+          count: number;
+        }>;
+      };
+      badges: Array<{
+        id: string;
+        name: string;
+        icon: string;
+      }>;
+    } | null;
+  };
+  errors?: Array<{ message: string }>;
+}
+
+interface StreakResponse {
+  data?: {
+    matchedUser?: {
+      userCalendar?: {
+        streak: number;
+        totalActiveDays: number;
+      } | null;
+    } | null;
+  };
+}
+
+// In-memory cache with TTL
+interface CacheEntry {
+  data: LeetCodeStats;
+  timestamp: number;
+}
+
+const leetcodeCache = new Map<string, CacheEntry>();
+const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+
+const LEETCODE_GRAPHQL_URL = "https://leetcode.com/graphql";
+
+const LEETCODE_QUERY = `
+  query getUserProfile($username: String!) {
+    matchedUser(username: $username) {
+      username
+      profile {
+        ranking
+      }
+      submitStatsGlobal {
+        acSubmissionNum {
+          difficulty
+          count
+        }
+      }
+      badges {
+        id
+        name
+        icon
+      }
+    }
+  }
+`;
+
+const STREAK_QUERY = `
+  query userProfileCalendar($username: String!, $year: Int) {
+    matchedUser(username: $username) {
+      userCalendar(year: $year) {
+        streak
+        totalActiveDays
+      }
+    }
+  }
+`;
+
+async function fetchStreakData(username: string): Promise<{ current: number; max: number; totalActiveDays: number }> {
+  try {
+    const currentYear = new Date().getFullYear();
+    const response = await fetch(LEETCODE_GRAPHQL_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Referer": "https://leetcode.com",
+        "User-Agent": "Mozilla/5.0 (compatible; PortfolioBot/1.0)",
+      },
+      body: JSON.stringify({
+        query: STREAK_QUERY,
+        variables: { username, year: currentYear },
+      }),
+    });
+
+    if (!response.ok) {
+      return { current: 0, max: 0, totalActiveDays: 0 };
+    }
+
+    const result: StreakResponse = await response.json();
+    
+    const userCalendar = result.data?.matchedUser?.userCalendar;
+    const streak = userCalendar?.streak || 0;
+    const totalActiveDays = userCalendar?.totalActiveDays || 0;
+
+    return {
+      current: streak,
+      max: streak,
+      totalActiveDays,
+    };
+  } catch {
+    return { current: 0, max: 0, totalActiveDays: 0 };
+  }
+}
+
+async function fetchLeetCodeStats(username: string): Promise<LeetCodeStats> {
+  // Check cache first
+  const cached = leetcodeCache.get(username.toLowerCase());
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+    return cached.data;
+  }
+
+  const [profileResponse, streakData] = await Promise.all([
+    fetch(LEETCODE_GRAPHQL_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Referer": "https://leetcode.com",
+        "User-Agent": "Mozilla/5.0 (compatible; PortfolioBot/1.0)",
+      },
+      body: JSON.stringify({
+        query: LEETCODE_QUERY,
+        variables: { username },
+      }),
+    }),
+    fetchStreakData(username),
+  ]);
+
+  if (!profileResponse.ok) {
+    throw { statusCode: 502, message: `LeetCode API returned status ${profileResponse.status}` };
+  }
+
+  const result: LeetCodeGraphQLResponse = await profileResponse.json();
+
+  if (result.errors && result.errors.length > 0) {
+    throw { statusCode: 502, message: `LeetCode GraphQL error: ${result.errors[0].message}` };
+  }
+
+  if (!result.data?.matchedUser) {
+    throw { statusCode: 404, message: `User '${username}' not found on LeetCode` };
+  }
+
+  const user = result.data.matchedUser;
+  const submissions = user.submitStatsGlobal.acSubmissionNum;
+
+  const solved = { total: 0, easy: 0, medium: 0, hard: 0 };
+
+  for (const stat of submissions) {
+    const count = stat.count || 0;
+    switch (stat.difficulty.toLowerCase()) {
+      case "all":
+        solved.total = count;
+        break;
+      case "easy":
+        solved.easy = count;
+        break;
+      case "medium":
+        solved.medium = count;
+        break;
+      case "hard":
+        solved.hard = count;
+        break;
+    }
+  }
+
+  // Parse badges - ensure icon URLs are absolute
+  const badges: LeetCodeBadge[] = (user.badges || []).map((badge) => {
+    let iconUrl = badge.icon || "";
+    // If icon is a relative URL, prepend LeetCode base URL
+    if (iconUrl && !iconUrl.startsWith("http")) {
+      iconUrl = `https://leetcode.com${iconUrl.startsWith("/") ? "" : "/"}${iconUrl}`;
+    }
+    return {
+      id: badge.id,
+      name: badge.name,
+      icon: iconUrl,
+    };
+  });
+
+  const stats: LeetCodeStats = {
+    username: user.username,
+    ranking: user.profile?.ranking || null,
+    solved,
+    streak: {
+      current: streakData.current,
+      max: streakData.max,
+    },
+    badges,
+    totalActiveDays: streakData.totalActiveDays,
+    updatedAt: new Date().toISOString(),
+  };
+
+  // Update cache
+  leetcodeCache.set(username.toLowerCase(), {
+    data: stats,
+    timestamp: Date.now(),
+  });
+
+  return stats;
+}
+
 // Embedded profile data to avoid file path issues
 const profile = {
   "name": "Gaurank Maheshwari",
@@ -79,6 +314,26 @@ app.use(express.urlencoded({ extended: true }));
 // Simple ping endpoint
 app.get("/api/ping", (_req, res) => {
   res.json({ message: "Hello from Express server v2!" });
+});
+
+// LeetCode stats endpoint
+app.get("/api/leetcode/:username", async (req, res) => {
+  const { username } = req.params;
+
+  if (!username || typeof username !== "string") {
+    return res.status(400).json({ error: "Username is required" });
+  }
+
+  try {
+    const stats = await fetchLeetCodeStats(username);
+    res.json(stats);
+  } catch (error: any) {
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({ error: error.message });
+    }
+    console.error(`Unexpected error fetching LeetCode stats: ${error}`);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 // Chat endpoint

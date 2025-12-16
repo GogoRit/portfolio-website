@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
 import { AIChatbot } from "./AIChatbot";
-import { useAnimation } from "../contexts/AnimationContext";
 import { useTooltipPosition } from "./ui/tooltip";
-import ReactDOM from "react-dom";
 import { createPortal } from "react-dom";
 
 // Bitmoji avatar path
@@ -18,7 +16,6 @@ export const AIWidget: React.FC = () => {
   const [widgetDimensions, setWidgetDimensions] = useState({ width: 80, height: 80 });
   const [isDragging, setIsDragging] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState<'left' | 'right' | 'top' | 'bottom'>('left');
-  const { showMainPage } = useAnimation();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const tooltipTimerRef = useRef<NodeJS.Timeout | null>(null);
   const controls = useAnimationControls();
@@ -34,9 +31,9 @@ export const AIWidget: React.FC = () => {
     setIsClient(true);
   }, []);
 
-  // Coordinate timing with main content reveal
+  // Show widget after client hydration
   useEffect(() => {
-    if (showMainPage && isClient) {
+    if (isClient) {
       // Delay widget appearance by 200ms to let main content render first
       const widgetTimer = setTimeout(() => {
         setIsWidgetVisible(true);
@@ -48,7 +45,7 @@ export const AIWidget: React.FC = () => {
         }
       };
     }
-  }, [showMainPage, isClient]);
+  }, [isClient]);
 
   // Calculate widget dimensions and set initial position to bottom-right
   useEffect(() => {

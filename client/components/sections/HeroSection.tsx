@@ -1,7 +1,6 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { Github, Linkedin, Download } from "lucide-react";
-import { EmbeddedChat } from "../EmbeddedChat";
 import { MapPin, GraduationCap, Building } from "lucide-react";
 
 const HeroSection: React.FC = () => (
@@ -20,26 +19,24 @@ const HeroSection: React.FC = () => (
       <div className="max-w-5xl mx-auto text-center">
         <div className="space-y-6 animate-slide-up">
           {/* Main heading with Apple-style typography */}
-          <h1 className="text-6xl lg:text-8xl font-light leading-tight tracking-tight">
+          <h1 className="text-4xl lg:text-6xl font-light leading-tight tracking-tight">
             Hi, I'm{" "}
             <span className="bg-gradient-to-r from-blue to-purple bg-clip-text text-transparent font-medium">
-              Gaurank
+              Gaurank.
             </span>
             <br />
-            building{" "}
+            I build{" "}
             <span className="bg-gradient-to-r from-green to-blue bg-clip-text text-transparent font-medium">
-              AI systems
+              machine learning systems
             </span>{" "}
-            with
-            <br />
-            impact, adaptability, and curiosity.
+            that ship — from model training and evaluation to reliable, cost-efficient production pipelines.
           </h1>
           
           {/* Subtitle with improved typography */}
           <p className="text-xl lg:text-2xl text-graphite/80 max-w-4xl mx-auto font-light leading-relaxed">
-          Machine Learning / AI Engineer | LLM Pipelines · GPU Optimization (PyTorch/CUDA/TensorRT) · LangChain | AAAI-26 Spotlight Author (Top 11%)
+            Machine Learning and AI Engineer specializing in LLM pipelines, inference optimization, and AI-driven automation. AAAI 2026 Spotlight Author (Top 11%).
             <br />
-            Building and Deploying production-grade LLM/AI systems, with deep expertise in GPU acceleration, low-latency inference, and scalable system architecture 
+            I help teams move beyond prototypes by improving latency, reliability, and operational scalability across real-world ML systems.
           </p>
           
           {/* Apple-style info badges */}

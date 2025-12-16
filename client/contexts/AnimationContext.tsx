@@ -26,7 +26,7 @@ interface AnimationProviderProps {
 export const AnimationProvider: React.FC<AnimationProviderProps> = ({ children }) => {
   const [agentLanded, setAgentLanded] = useState(false);
   const [animationTriggered, setAnimationTriggered] = useState(false);
-  const [showMainPage, setShowMainPage] = useState(false);
+  const [showMainPage, setShowMainPage] = useState(true); // Intro animation disabled
 
   return (
     <AnimationContext.Provider 

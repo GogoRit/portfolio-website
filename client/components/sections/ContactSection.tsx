@@ -17,8 +17,7 @@ const ContactSection: React.FC = () => {
               Let's Build Something Amazing Together
             </h3>
             <p className="text-muted-foreground mb-2">
-              Open to opportunities in AI infrastructure, ML products, and
-              full-stack development
+              Open to ML Engineer, Applied Scientist, and AI Engineer roles.
             </p>
             <p className="text-sm text-muted-foreground mb-8">
               gm8189@g.rit.edu • 📱 +1 (585) 957-6312 • 📍 Rochester, NY

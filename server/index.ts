@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { chatRouter } from "./routes/chat";
+import { leetcodeRouter } from "./routes/leetcode";
 import logger from "./logger";
 
 export function createServer(options: { serverless?: boolean } = {}) {
@@ -20,6 +21,7 @@ export function createServer(options: { serverless?: boolean } = {}) {
 
   app.get("/api/demo", handleDemo);
   app.use("/api/chat", chatRouter);
+  app.use("/api/leetcode", leetcodeRouter);
 
   // Only add static file serving and SPA routing for full server mode
   if (!options.serverless) {

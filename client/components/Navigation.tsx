@@ -1,44 +1,57 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useLocation } from "react-router-dom";
 
 // Apple-style system icons (improved, more polished)
 const AppleIcons = {
   home: (
-    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M12 3L4 9v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9l-8-6zM12 17.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-    </svg>
-  ),
-  projects: (
-    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM20 18H4V8h16v10z"/>
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
     </svg>
   ),
   timeline: (
-    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+    // Briefcase icon for career/experience timeline
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>
+    </svg>
+  ),
+  research: (
+    // Lightbulb/idea icon for research
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/>
+    </svg>
+  ),
+  projects: (
+    // Code/terminal icon for projects
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
     </svg>
   ),
   now: (
-    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+    // Pulse/activity icon for current activities
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
     </svg>
   ),
   skills: (
-    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+    // Chip/CPU icon for technical skills
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M6 4h12v2h-12zM6 18h12v2h-12zM4 6h2v12h-2zM18 6h2v12h-2zM9 9h6v6h-6z"/>
+      <path d="M9 3h2v3h-2zM13 3h2v3h-2zM9 18h2v3h-2zM13 18h2v3h-2zM3 9h3v2h-3zM18 9h3v2h-3zM3 13h3v2h-3zM18 13h3v2h-3z"/>
     </svg>
   ),
   contact: (
-    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+    // Email icon for contact
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
       <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
     </svg>
   ),
   menu: (
-    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
       <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
     </svg>
   ),
   close: (
-    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
       <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
     </svg>
   ),
@@ -46,8 +59,8 @@ const AppleIcons = {
 
 const navItems = [
   { label: "Home", href: "#hero", icon: AppleIcons.home },
-  { label: "Timeline", href: "#timeline", icon: AppleIcons.timeline },
-  { label: "Research", href: "#research", icon: AppleIcons.projects },
+  { label: "Experience", href: "#timeline", icon: AppleIcons.timeline },
+  { label: "Research", href: "#research", icon: AppleIcons.research },
   { label: "Projects", href: "#projects", icon: AppleIcons.projects },
   { label: "Now", href: "#now", icon: AppleIcons.now },
   { label: "Skills", href: "#skills", icon: AppleIcons.skills },
@@ -55,6 +68,7 @@ const navItems = [
 ];
 
 const Navigation: React.FC = () => {
+  const location = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("#hero");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -169,89 +183,63 @@ const Navigation: React.FC = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // Intersection Observer for active section detection
+  // Scroll-based active section detection
   useEffect(() => {
-    const sectionElements = navItems
-      .map((item) => document.querySelector(item.href) as HTMLElement | null)
-      .filter(Boolean) as HTMLElement[];
-
-    if (sectionElements.length === 0) return;
-
-    // Create separate observers for different section types
-    const createObserver = (threshold: number) => new IntersectionObserver(
-      (entries) => {
-        // Sort entries by their position in the document to ensure proper order
-        const sortedEntries = entries.sort((a, b) => {
-          const aRect = a.boundingClientRect;
-          const bRect = b.boundingClientRect;
-          return aRect.top - bRect.top;
-        });
-
-        // Find the most appropriate active section
-        let newActiveSection = activeSection;
-        
-        for (const entry of sortedEntries) {
-          if (entry.isIntersecting) {
-            // Only update if this section is more prominent in the viewport
-            const intersectionRatio = entry.intersectionRatio;
-            if (intersectionRatio >= threshold) {
-              newActiveSection = `#${entry.target.id}`;
-              break; // Use the first (topmost) intersecting section
-            }
-          }
-        }
-        
-        if (newActiveSection !== activeSection) {
-          setActiveSection(newActiveSection);
-        }
-      },
-      { 
-        threshold, 
-        rootMargin: `-${headerHeight + 32}px 0px 0px 0px` 
-      }
-    );
-
-    // Use different thresholds for different sections
-    const longSectionObserver = createObserver(0.4); // For longer sections - higher threshold
-    const shortSectionObserver = createObserver(0.2); // For medium sections like Research and Now
-    const ultraShortSectionObserver = createObserver(0.15); // For very short sections like Skills and Contact
-
-    sectionElements.forEach((el) => {
-      const sectionId = el.id;
-      // Use different thresholds based on section content length
-      if (sectionId === 'skills' || sectionId === 'contact') {
-        ultraShortSectionObserver.observe(el);
-      } else if (sectionId === 'research' || sectionId === 'now') {
-        shortSectionObserver.observe(el);
-      } else if (sectionId === 'timeline') {
-        // Use a higher threshold for timeline to prevent early activation
-        shortSectionObserver.observe(el);
-      } else {
-        longSectionObserver.observe(el);
-      }
-    });
-
-    // Special handling for Hero section at top and Contact section at bottom
     const handleScrollPosition = () => {
-      // If we're at the very top, ensure Hero is active
+      const scrollPosition = window.scrollY + headerHeight + 100; // Offset for better UX
+      
+      // Get all section elements
+      const sections = navItems
+        .map((item) => {
+          const el = document.querySelector(item.href) as HTMLElement | null;
+          if (el) {
+            return { id: item.href, top: el.offsetTop, bottom: el.offsetTop + el.offsetHeight };
+          }
+          return null;
+        })
+        .filter(Boolean) as { id: string; top: number; bottom: number }[];
+
+      if (sections.length === 0) return;
+
+      // Special case: at the very top
       if (window.scrollY <= 50) {
         setActiveSection("#hero");
+        return;
       }
-      // If we're at the bottom, ensure Contact is active
-      else if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 10) {
+
+      // Special case: at the very bottom
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) {
         setActiveSection("#contact");
+        return;
       }
+
+      // Find the section that contains the current scroll position
+      let currentSection = "#hero";
+      for (const section of sections) {
+        if (scrollPosition >= section.top) {
+          currentSection = section.id;
+        }
+      }
+
+      setActiveSection(currentSection);
     };
 
-    window.addEventListener("scroll", handleScrollPosition);
+    // Initial check
+    handleScrollPosition();
+
+    window.addEventListener("scroll", handleScrollPosition, { passive: true });
 
     return () => {
-      longSectionObserver.disconnect();
-      shortSectionObserver.disconnect();
-      ultraShortSectionObserver.disconnect();
       window.removeEventListener("scroll", handleScrollPosition);
     };
   }, [headerHeight]);
+
+  // Hide navigation on case study pages - use conditional rendering instead of early return
+  const isCaseStudyPage = location.pathname.startsWith("/case-study/");
+  
+  if (isCaseStudyPage) {
+    return null;
+  }
 
   return (
     <>

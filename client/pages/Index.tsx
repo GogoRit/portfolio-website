@@ -6,11 +6,9 @@ import ProjectsSection from "../components/sections/ProjectsSection";
 import NowSection from "../components/sections/NowSection";
 import SkillsSection from "../components/sections/SkillsSection";
 import ContactSection from "../components/sections/ContactSection";
-import { useAnimation } from "../contexts/AnimationContext";
+import CertificationsDeck from "../components/CertificationsDeck";
 
 const Index: React.FC = () => {
-  const { showMainPage } = useAnimation();
-
   return (
     <div className="bg-gradient-to-br from-silver via-white to-silver">
       {/* Hero Section - First to appear */}
@@ -41,6 +39,13 @@ const Index: React.FC = () => {
       {/* Skills Section - Technical abilities and expertise */}
       <section id="skills">
         <SkillsSection />
+      </section>
+
+      {/* Certifications Section - Training and credentials */}
+      <section id="certifications">
+        <div className="max-w-6xl mx-auto px-4">
+          <CertificationsDeck />
+        </div>
       </section>
 
       {/* Contact Section - Final sections with landing impact */}
